@@ -1,0 +1,10 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {section}{\numberline {2}How does SWMM work?}{4}{section.2}
+\contentsline {section}{\numberline {3}How does the Toolbox work?}{5}{section.3}
+\contentsline {section}{\numberline {4}Co-simulation functions and constants}{5}{section.4}
+\contentsline {section}{\numberline {5}Example running a single simulation}{8}{section.5}
+\contentsline {subsection}{The case study}{8}{section*.5}
+\contentsline {subsection}{The Python Toolbox - (Check the source code \leavevmode {\color {blue}\href {https://bitbucket.org/swmmtoolbox001/python-module}{here}})}{9}{section*.7}
+\contentsline {subsection}{The Matlab Toolbox - (Check the source code \leavevmode {\color {blue}\href {https://bitbucket.org/swmmtoolbox001/matlab-module}{here}})}{12}{section*.9}
+\contentsline {subsection}{The LabVIEW Toolbox}{14}{section*.11}
+\contentsline {section}{\numberline {6}Example running $n$ simulations}{15}{section.6}
