@@ -1,0 +1,18 @@
+LIBRARY     SWMM5.DLL
+
+EXPORTS
+    swmm_close
+    swmm_end
+    swmm_getMassBalErr
+    swmm_getVersion
+    swmm_open
+    swmm_report
+    swmm_run
+    swmm_start
+    swmm_step                    
+    swmm_get
+    swmm_get_from_input
+    swmm_save_all
+    swmm_modify_setting
+    swmm_modify_input
+    swmm_save_results
