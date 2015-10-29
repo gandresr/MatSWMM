@@ -21,7 +21,8 @@ classdef SWMM < handle
             FLOODING = 206;
             PRECIPITATION = 207;
             RUNOFF = 208;
-            CAPACITY = 209;
+            MAX_AREA = 209;
+            CAPACITY = -200;
             % Report constants
             NO_REPORT = 0;
             WRITE_REPORT = 1;
@@ -48,6 +49,7 @@ classdef SWMM < handle
             % Variable properties
             elapsed_time;
             timePtr;
+            is_initialized = false;
         end
         properties (Hidden = true)
             % Error codes
@@ -80,10 +82,14 @@ classdef SWMM < handle
        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
        %%
        function open(obj, input_file)
-       % SWMM_OPEN_FILE
-       % Inputs: input_file (str) -> Path to the input file .inp
-       % Outputs: none
-       % Purpose: opens the files required to run a swmm simulation
+       %* swmm_open *
+       %
+       %    This SWMM function opens the files required to run a swmm
+       %    simulation
+       %
+       %    swmm.open(p)
+       %
+       %    p: path to the input file .inp
            if ~(libisloaded('swmm5'))
                loadlibrary('swmm5');
            end
@@ -97,11 +103,14 @@ classdef SWMM < handle
        end
        %%
        function start(obj, write_report)
-       % SWMM_START
-       % Inputs:  write_report (int) -> constant related to the write report 
-       %		  file option.
-       % Outputs: None
-       % Purpose: starts a SWMM simulation. Raise Exception if there is an error.
+       %* swmm_start *
+       %
+       %    This SWMM function starts a SWMM simulation. 
+       %    Raise Exception if there is an error
+       %
+       %    swmm.start(w)
+       %
+       %    w: constant related to the write report file option
        
            if ~ismember(write_report, [obj.NO_REPORT, obj.WRITE_REPORT])
                 throw(obj.ERROR_MSG_INCOHERENT);
@@ -117,21 +126,23 @@ classdef SWMM < handle
            if error ~= 0
                throw(obj.ERROR_MSG_SYSTEM);
            end
+           
+           obj.is_initialized = true;
        end
        %%
        function time = run_step(obj)
-       % SWMM_RUN_STEP
-       % Inputs:  None
-       % Outputs: time (double) - Elapsed time in hours
-       % Purpose: advances the simulation by one routing time step. Raise Exception 
-       %   	   if there is an error.
+       %* swmm_run_step *
+       %
+       %    This SWMM function advances the simulation by one routing time
+       %    step. Raise Exception if there is an error
+       %    
+       %    t = swmm.run_step
+       %
+       %    t: elapsed time in hours
        
             if ~(libisloaded('swmm5'))
                 loadlibrary('swmm5');
             end
-            
-            
-
             error = calllib('swmm5','swmm_step', obj.timePtr);
             time  = obj.timePtr.value*24;
 
@@ -143,10 +154,12 @@ classdef SWMM < handle
        end
        %%
        function duration = end_sim(obj)
-       % SWMM_END
-       % Inputs:  None
-       % Outputs: None
-       % Purpose: ends a SWMM simulation. Raise Exception if there is an error.
+       %* swmm_end_sim *
+       %
+       %    This SWMM function ends a SWMM simulation. Raise Exception if 
+       %    a SWMM simulation has not been started
+       %    
+       %    swmm.end_sim
 
            if ~(libisloaded('swmm5'))
                loadlibrary('swmm5');
@@ -159,14 +172,17 @@ classdef SWMM < handle
                    sprintf('Error %d: The simulation can not be ended', error));
                throw(exception);
            end
-           duration = toc;       
+           duration = toc;  
+           obj.is_initialized = false;
        end
        %%
        function report(obj)
-       % SWMM_SAVE_REPORT
-       % Inputs:  None
-       % Outputs: None
-       % Purpose: writes simulation results to report file. Raise Exception if there is an error.
+       %* swmm_report *
+       %
+       %    This SWMM function writes the simulation results to report file.
+       %    Raise Exception if a SWMM simulation has not been completed
+       %    
+       %    swmm.report
 
            if ~(libisloaded('swmm5'))
                loadlibrary('swmm5');
@@ -182,10 +198,12 @@ classdef SWMM < handle
        end
        %%
        function close(obj)
-       % SWMM_CLOSE 
-       % Inputs:  None
-       % Outputs: None
-       % Purpose: closes a SWMM project. Raise Exception if there is an error.
+       %* swmm_close *
+       %
+       %    This SWMM function closes a SWMM project. Raise Exception if 
+       %    a SWMM simulation has not been completed
+       %
+       %    swmm.close
 
            if ~(libisloaded('swmm5'))
                loadlibrary('swmm5');
@@ -202,13 +220,15 @@ classdef SWMM < handle
        end
        %%
        function errors = get_mass_bal_error(obj)
-        % SWMM_MASS_BAL_ERR 
-        % Inputs: None.
-        % Outputs: errors (vector) -> Values of the errors related to mass balance.
-        %		 			   [0] <- Runoff error
-        %		 			   [1] <- Flow error
-        %		 			   [2] <- Quality error
-        % Purpose: gets the mass balance errors of the simulation.
+       %*swmm_get_mass_bal_error *
+       %
+       %    This SWMM function gets the mass balance errors of the 
+       %    simulation
+       %
+       %    e = swmm.get_mass_bal_error
+       %
+       %    e: Values of the errors related to mass balance
+       %    e(1) run-off error | e(2) flow error | e(3) quality error       
 
             runOffErr = single(0);
             flowErr = single(0);
@@ -234,10 +254,15 @@ classdef SWMM < handle
             errors = [runoff, flow, qual];
        end
        %%
-       function bool_ans = is_over(obj)    
-       % Inputs: None
-       % Outputs: _ (Bool) -> True if the simulation is over, False otherwise
-       % Purpose: determines if the simulation is over or not.
+       function bool_ans = is_over(obj)
+       %* swmm_is_over * 
+       %
+       %    This MatSWMM function determines if the simulation is over 
+       %    or not
+       %
+       %    b = swmm.is_over
+       %
+       %    b: true if the simulation is over, false otherwise
        
            bool_ans = obj.timePtr.value == 0;
        end
@@ -245,12 +270,20 @@ classdef SWMM < handle
        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
        % Getters & Setters
        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%
-        function values = step_get(obj, list_ids, attribute, unit_system)
-        % SWMM_STEP_GET
-        % Purpose: Get values of multiple objects while running the
-        % simulation
-        % Input/Output: The same of swmm.get
+       %%
+       function values = step_get(obj, list_ids, attribute, unit_system)
+       %* swmm_step_get *
+       %
+       %	This MatSWMM function retrieves the values of an specific
+       %    property of multiple objects while running the simulation
+       %   
+       %	val = swmm.step_get(id, attr, un)
+       %
+       %	id: ID of the object, as saved in SWMM
+       %	attr: constant related to the attribute of the object
+       %	un: constant related to the units of the attribute that is 
+       %	going to be retrieved
+       %    val: requested value
         
             if isa(list_ids, 'char')
                 values = obj.get(list_ids, attribute, unit_system);
@@ -263,12 +296,18 @@ classdef SWMM < handle
         end
         %%
         function value = get_from_input(obj, input_file, object_id, attribute)
-        % SWMM_GET_FROM_INPUT
-        % Inputs:  input_file  (str) -> Path to input file.
-        %          object_id   (str) -> ID of the object, as saved in SWMM.
-        %          attribute   (int) -> constant, related to the attribute of the object.
-        % Outputs: value (double) -> This is the value of the attribute being sought in the input file.
-        % Purpose: returns the value of the attribute in the input file.
+        %* swmm_get_from_input *
+        %
+        %	This MatSWMM function returns the value of the attribute in the
+        %   input file
+        %
+        %   val = swmm.get_from_input(p, id, attr)
+        %   
+        %   p: path to input file
+        %   id: ID of the object, as saved in SWMM
+        %   attr: constant, related to the attribute of the object
+        %   val: this is the value of the attribute being sought in the
+        %   input file
         
             if ~ismember(attribute, [obj.INVERT, obj.DEPTH_SIZE, obj.STORAGE_A, ...
                     obj.STORAGE_B, obj.STORAGE_C, obj.LENGTH, obj.ROUGHNESS, ...
@@ -294,17 +333,35 @@ classdef SWMM < handle
         end
         %%
         function [id_list, value_list] = get_all(obj, input_file, object_type, attribute)
-        % SWMM_GET_ALL
-        % Inputs:  input_file  (str)    -> Path to input file.
-        %          object_type (int)    -> constant, related to the type of the object.
-        %          attribute   (int)    -> constant, related to the attribute of the object.
-        % Outputs: id_list     (cell)   -> Cell of char with the IDs of the elements that were requested. 
-        %          value_list  (double) -> Array of double with the values of the attributes that were requested.
-        % Purpose: returns an iterable object (dict/list) with the information that was requested.
-        %          If attribute == -1 -> Returns a list.
+        %* swmm_get_all *
+        %
+        %   This MatSWMM function returns all the objects of a certain type
+        %   (e.g., NODES, LINK, SUBCATCH, STORAGE, OUTFALL, JUNCTION)
+        %   and the value of one of their properties
+        %
+        %   [ids, values] = swmm.get_all(p, type, attr)
+        %
+        %   p: path to input file
+        %   type: constant related to the type of the objecs
+        %   attr: constant related to the attribute of the objects
+        %   ids: IDs of the group objects that was requested
+        %   values: values of the property of the group of objects
             
             if (attribute == obj.NONE)
                 attribute = -1;
+            end
+            
+            if (attribute == obj.MAX_AREA)
+                if object_type ~= obj.LINK
+                    throw(obj.ERROR_MSG_ATR);
+                end
+                id_list = obj.get_all(input_file, object_type, obj.NONE);
+                obj.initialize(input_file);
+                for i = 1 : length(id_list)
+                    value_list(i) = obj.get(id_list{i}, obj.MAX_AREA, obj.SI);
+                end
+                obj.finish;
+                return;
             end
             
             if attribute ~= -1
@@ -381,12 +438,17 @@ classdef SWMM < handle
         end
         %% 
         function modify_input(obj, input_file, object_id, attribute, value)
-        % SWMM_MODIFY_INPUT
-        % Inputs:  input_file 	 (str)    -> Path to the input file.
-        %		   object_id	 (str)    -> ID of the object that is going to be changed.
-        %		   attribute     (int)    -> Constant - Attribute that is going to be changed.
-        %		   value         (double) -> Value of the attribute that is going to be changed.
-        % Purpose: It modifies a specific attribute from the input file.
+        %* swmm_modidfy_input *
+        %
+        %   This MatSWMM function modifies a specific attribute from the 
+        %   input file
+        %
+        %   swmm.modify_input(p, id, attr, val)
+        %
+        %   p: path to the input file
+        %	id: ID of the object that is going to be changed
+        %	attr: constant related to the attribute of the objects that is going to be changed
+        %	val: value of the attribute that is going to be changed
 
             if ~(libisloaded('swmm5'))
                 loadlibrary('swmm5');
@@ -406,13 +468,17 @@ classdef SWMM < handle
         end
         %%
         function modify_settings(obj, orifices_ids, new_settings)
-        % SWMM_MODIFY_SETTINGS
-        % Inputs:  orifices_ids	(str)    -> List of orifices IDs, as saved in SWMM.
-        % new_setting 	(double) -> List of Percentage of openning of the orifices.
-        % Outputs: None.
-        % Purpose: modifies the setting of an orifice during the simulation.
+        %* swmm_modify_settings *
+        %
+        %   This MatSWMM function modifies the setting of several orifices
+        %   during the simulation
+        %
+        %   swmm.modify_settings(ids, settings)
+        %
+        %   ids: IDs of the orifices as saved in SWMM
+        %   settings: vector with the values of the settings
             for i=1:length(orifices_ids)
-                obj.modify_setting(orifice_ids(i), new_settings(i));
+                obj.modify_setting(orifices_ids{i}, new_settings(i));
             end
         end
         %%
@@ -420,13 +486,16 @@ classdef SWMM < handle
         % Compacted functionality
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [errors, duration] = run_simulation(obj, input_file)
-        % SWMM_RUN_SIMULATION
-        % Inputs: input_file   (str) -> Path to the input file.
-        % Outputs: errors   (double) -> double Array with the three errors
-        %          related to the simulation.
-        %          duration (double) -> duration in seconds of the
-        %          simulation.
-        % Purpose: Runs a SWMM simulation
+        %* swmm_run_simulation *
+        %
+        %   This MatSWMM function runs a SWMM simulation
+        %
+        %   [e, d] = swmm.run_simulation(p)
+        %
+        %   p: path to the input file
+        %	e: vector of errors
+        %   e(1) run-off | e(2) flow rounting | e(3) water quality
+        %   d: duration in seconds of the simulation
           obj.initialize(input_file);
           while ~obj.is_over
             obj.run_step;
@@ -434,28 +503,40 @@ classdef SWMM < handle
           [errors, duration] = obj.finish;
         end
         function initialize(obj, input_file)
-        % SWMM_INITIALIZE
-        % Inputs: input_file   (str) -> Path to the input file.
-        %         write_report (int) -> Constant that determines if SWMM
-        %         wirtes a report file or not.
-        % Outputs: None
-        % Purpose: Compacts 2 methods in one
+        %* swmm_initialize *
+        %
+        %   This MatSWMM function simplifies the initialization process
+        %   of SWMM using two functions {open, start}
+        %
+        %   swmm.initialize(p)
+        %
+        %   p: path to the input file
             obj.open(input_file);
             obj.start(obj.WRITE_REPORT);
         end
         %%
         function save_results(obj)
+        %* swmm_save_results *
+        %
+        %   This MatSWMM function saves all the results of the simulation 
+        %   in csv files, organized in 4 folders in the workspace directory.
+        %   The folders are related to the type of objects (Link, Node,
+        %   Subcatch). A folder called 'Time' with information of the step
+        %   size is alse saved
+        %
+        %   swmm.save_results
            error = calllib('swmm5','swmm_save_results');           
         end
         %%
         function [errors, duration] = finish(obj)
-        % SWMM_FINISH
-        % Inputs: None
+        %* swmm_finish *
+        %
+        %   This MatSWMM function 
         % Outputs: errors   (double) -> double Array with the three errors
         %          related to the simulation.
         %          duration (double) -> duration in seconds of the
         %          simulation.
-        % Purpose: 4 methods in one
+        %4 methods in one
             duration = obj.end_sim;
             errors = obj.get_mass_bal_error;
             obj.report;
@@ -480,6 +561,14 @@ classdef SWMM < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%
         function tflooding = total_flooding(obj)
+        %* swmm_total_flooding *
+        %
+        %   This MatSWMM function calculates the total flooding in the
+        %   Urban Drainage System
+        %
+        %   f = swmm.total_flooding
+        %   
+        %   f: total flooding [m^3/s]
             nodes = obj.getAllFiles('Nodes');
             tflooding = 0;
             for i=1 : length(nodes)
@@ -491,19 +580,24 @@ classdef SWMM < handle
         end
         %%
         function [time, result] = read_results(obj, object_id, object_type, attribute)
-        % SWMM_READ_RESULTS
-        % Inputs: object_id (string/cell) - IDs of the objects
-        %         attribute (int) - constant related to the requested
-        %         object
-        % Outputs: time (double) - Vector with time in hours
-        %          result (double) - Vector with the requested data
-        % Purpose: Retrieve information after the simulation.
-        %   Compatible attributes with Subcatchments:
+        %* swmm_read_results *
+        %
+        %   This MatSWMM function retrieves the results of an specific type
+        %   of object after the simulation
+        %
+        %   Compatible attributes with Subcatchments
         %       PRECIPITATION | RUNOFF
-        %   Compatible attributes with Nodes:
+        %   Compatible attributes with Nodes
         %       INFLOW | FLOODING | DEPTH | VOLUME
-        %   Compatible attributes with Links:
+        %   Compatible attributes with Links
         %       FLOW | DEPTH | VOLUME | CAPACITY
+        %
+        %   [t, val] = swmm.read_results(id, type, attr)
+        %
+        %   id: IDs of the objects
+        %   attr: constant related to the attribute of the requested object
+        %	t: vector with time in hours
+        %	val: vector with the requested data
             if object_type == obj.LINK
                 folder = 'Links/';
                 compatible = [obj.FLOW, obj.DEPTH, obj.VOLUME, obj.CAPACITY];
@@ -544,12 +638,15 @@ classdef SWMM < handle
         end
         %%
         function modify_setting(obj, orifice_id, new_setting)
-        % SWMM_MODIFY_SETTING
-        % Inputs:  orifice_id  (str)    -> ID of the orifice, as saved in SWMM.
-        %          new_setting (double) -> Percentage of openning of the orifice.
-        %          adj_time	 (double) -> Time taken for the orifice to adjust.
-        % Outputs: None.
-        % Purpose: modifies the setting of an orifice during the simulation.
+        %* swmm_modify_setting *
+        %
+        %   This MatSWMM function modifies the setting of an orifice during
+        %   the simulation
+        %
+        %   swmm.modify_setting(id, p)
+        %
+        %   id: ID of the orifice, as saved in SWMM
+        %   p: new setting of the orifice
         
             if ~(libisloaded('swmm5'))
                 loadlibrary('swmm5');
@@ -564,24 +661,32 @@ classdef SWMM < handle
         end
         %%
         function current_time = get_time(obj)
-        % SWMM_GET_TIME
-        % Inputs: None
-        % Outputs: current_time (double) -> Value of the current time of the simulation in hours.
-        % Purpose: returns the current hour of the simulation.
+        %* swmm_get_time *
+        %
+        %   This MatSWMM function returns the current hour of the
+        %   simulation
+        %
+        %   t: current time of the simulation in hours
             current_time = obj.timePtr.value*24;
         end
         %%
        function value = get(obj, object_id, attribute, unit_system)
-       % SWMM_GET
-       % Inputs: object_id	  (str) -> ID of the object, as saved in SWMM.
-       %         attribute   (int) -> swmm.py constant, related to the attribute of the object.
-       %         unit_system (int) -> swmm.py constant, related to the units of the attribute that is going
-       %                              to be retrieved.
-       % Outputs: _ (double) -> This is the value of the attribute being sought.
-       % Purpose: returns the value of the attribute.
+       %* swmm_get *
+       %
+       %    This MatSWMM function returns the value of an attribute 
+       %    of an object, during the simulation
+       %
+       %    val = swmm.get(id, attr, un)
+       %
+       %    id: ID of the object, as saved in SWMM
+       %    attr: constant related to the attribute of the object
+       %    un: constant related to the units of the attribute that is going
+       %    to be retrieved
+       %	val: value of the attribute being sought
+       
        
            if ~ismember(attribute, [obj.DEPTH, obj.VOLUME, obj.FLOW, obj.SETTING, obj.FROUDE, obj.INFLOW, obj.FLOODING, ...
-                        obj.PRECIPITATION, obj.RUNOFF])
+                        obj.PRECIPITATION, obj.RUNOFF, obj.MAX_AREA])
                throw(obj.ERROR_MSG_INCOHERENT);
            elseif ~ismember(unit_system, [obj.SI, obj.US, obj.DIMENTIONLESS])
                throw(obj.ERROR_MSG_INCOHERENT);            
@@ -599,16 +704,15 @@ classdef SWMM < handle
            end
        end
         %%
-        % SWMM_GET_INCIDENCE_MATRIX
-        % Inputs
-        %   - input_file (str) -> path to the swmm input file.
-        % Outputs: 
-        %   - I (double) -> Incidence matrix
-        %   - nodes (cell) -> list of the IDs of the nodes
-        %   - links (cell) -> list of the IDs of the links
-        % Purpose: 
-        %   Returns the graph representation of the network.
         function [I, nodes, links] = get_incidence_matrix(obj, input_file)
+        %* swmm_get_incidence_matrix *
+        %
+        %   This MatSWMM function returns the graph representation of the
+        %   network
+        %   p: path to the swmm input file
+        %   I: Incidence matrix
+        %   nodes: ordered IDs of the nodes
+        %   links: ordered IDs of the links
             % Conduits
             [~, from] = obj.get_all(input_file, obj.LINK, obj.FROM_NODE);
             [conduits, to] = obj.get_all(input_file, obj.LINK, obj.TO_NODE);
@@ -653,12 +757,44 @@ classdef SWMM < handle
         end
         %%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Control Oriented Models
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%
+        function K = nashK(V, Qout)
+            n = size(Qout, 2);
+            K = zeros(n,1);
+            for i=1 : n
+                % Least squares with Yalmip
+                k = sdpvar(1,1);
+                Qout_hat = k*V(:,i);
+                objective = norm(Qout_hat - Qout(:,i),2);
+                optimize([],objective);
+                K(i) = value(k);
+            end
+        end
+        function [A, B] = muskingum(obj, V, Qin, Qout)
+            n = size(Qout, 2);
+            A = zeros(n,1); B = zeros(n,1);
+            for i=1 : n
+                % Least squares with Yalmip
+                a = sdpvar(1,1);
+                b = sdpvar(1,1);
+                V_hat = A*Qin(:,i) + B*Qout(:,i);
+                objective = norm(V_hat - V(:,i),2);
+                optimize([],objective);
+                A(i) = value(a);
+                B(i) = value(b);
+            end
+        end
+        %%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % External Methods
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%
-       function lineArray = read_mixed_csv(obj, fileName, delimiter)
+       function lineArray = read_mixed_csv(~, fileName, delimiter)
        % Auxiliar function
-       % Retrieved from -- http://stackoverflow.com/questions/4747834/import-csv-file-with-mixed-data-types
+       % Retrieved from 
+       % http://stackoverflow.com/questions/4747834/import-csv-file-with-mixed-data-types
        
            fid = fopen(fileName,'r');   %# Open the file
            lineArray = cell(100,1);     %# Preallocate a cell array (ideally slightly
@@ -686,7 +822,7 @@ classdef SWMM < handle
            end
        end
        %%
-       function fileList = getAllFiles(obj, dirName)
+       function fileList = getAllFiles(~, dirName)
           dirData = dir(dirName);      %# Get the data for the current directory
           dirIndex = [dirData.isdir];  %# Find the index for directories
           fileList = {dirData(~dirIndex).name}';  %'# Get a list of the files
@@ -702,6 +838,41 @@ classdef SWMM < handle
             fileList = [fileList; getAllFiles(nextDir)];  %# Recursively call getAllFiles
           end
 
+        end
+        %%
+        function output = pdyncontrol(obj, controller, type, w0, v, dt, varagin)
+        % pdyncontrol
+        % Parameters (all the parameters must be row vectors)
+        % - controller (char) ['replicator', 'smith', 'projection']
+        % - type (char) topology of the network associated to the controller
+        %     ['divergence', 'convergence']
+        % - w0 (double) row vector of assignment x_k
+        % - v (double) row vector of available resources
+        % - dt (double) sampling time
+        % - bta (double) adjustment factor
+            
+            if strcmp('divergence', type) % n
+                f = 1-v(:);
+            else
+                f = v(:);
+            end
+            
+            if nargin == 6
+                bta = varagin(1);
+            end
+            
+            n = length(w0);
+            if strcmp(controller, 'replicator')
+                % bta: sintonization parameter
+                output = (bta + f(:))/(bta + w0(:)'*f(:)) .* w0(:);
+            elseif strcmp(controller, 'smith')
+                fik_fjk = repmat(f(:), 1, n)' - repmat(f(:), 1, n);
+                fjk_fik = -fik_fjk;
+                output = dt *( max(0, (fik_fjk))'*w0(:) - w0(:).*sum(max(0, fjk_fik))' ) + w0(:);
+            elseif strcmp(controller, 'projection')
+                output = dt * (f(:) - (1/n)*sum(f)) + w0(:);        
+            end
+            
         end
    end
 end
