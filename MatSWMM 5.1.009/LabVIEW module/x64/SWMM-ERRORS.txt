@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<nidocument>
+<nicomment>
+
+<nifamily familyname="My Error Range" displayname="My Error Range">
+</nifamily>
+</nicomment>
+<nierror code="-300">
+Object not found
+</nierror>
+<nierror code="-299">
+Type of object not compatible
+</nierror>
+<nierror code="-298">
+Attribute not compatible
+</nierror>
+<nierror code="-297">
+Incorrect file path
+</nierror>
+<nierror code="-296">
+Incoherent parameter
+</nierror>
+</nidocument>
