@@ -11,3 +11,5 @@
     [time, fn5] = swmm.read_results(links, swmm.LINK, swmm.VOLUME);
     plot(time, fn5);
     
+    disp('MatSWMM is awesome! isn´t it?');
+    
