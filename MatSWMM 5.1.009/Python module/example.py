@@ -1,5 +1,5 @@
 # Imported modules
-from swmm import *  # The SWMM module
+import swmm  # The SWMM module
 import matplotlib.pyplot as plt  # Module for plotting
 
 # ***********************************************************************
@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt  # Module for plotting
 # ***********************************************************************
 
 inp    = "swmm_files/3tanks.inp"  # Input file
-report = "swmm_files/3tanks.rpt"  # Report file
-out    = "swmm_files/3tanks.out"  # Output file
 flow   = []
 vol    = []
 time   = []
@@ -17,28 +15,27 @@ time   = []
 #  Initializing SWMM
 # ***********************************************************************
 
-open_file(inp, report, out)  # Step 1
-start(NO_REPORT)  # Step 2
+swmm.initialize(inp)  # Step 1
 
 # ***********************************************************************
 #  Step Running
 # ***********************************************************************
 
 # Main loop: finished when the simulation time is over.
-while( not is_over() ): 
+while( not swmm.is_over() ): 
 
 	# ----------------- Run step and retrieve simulation time -----------
 	
-	time.append(get_time())
-	run_step()  # Step 3
+	time.append( swmm.get_time() )
+	swmm.run_step()  # Step 2
 	
 	# --------- Retrieve & modify information during simulation ---------
 	# Retrieve information about flow in C-5
-	f = get(LINK, 'C-5', FLOW, SI)   
+	f = swmm.get('C-5', swmm.FLOW, swmm.SI)   
 	# Stores the information in the flow vector
 	flow.append(f)					 
 	# Retrieve information about volume in V-1
-	v = get(NODE, 'V-1', VOLUME, SI) 
+	v = swmm.get('V-1', swmm.VOLUME, swmm.SI) 
 	# Stores the information in the volume vector
 	vol.append(v)					 
 
@@ -49,18 +46,15 @@ while( not is_over() ):
 	# opened.
 
 	if f >= 2:
-		modify_setting('R-4', 0)
+		swmm.modify_setting('R-4', 0)
 	else:
-		modify_setting('R-4', 1)
+		swmm.modify_setting('R-4', 1)
 
 # ************************************************************************
 #  End of simulation
 # ************************************************************************
 
-end()  # Step 4
-errors = get_mass_bal_error()  # Step 5
-save_report()  # Step 6
-close()  # Step 7
+errors = swmm.finish() # Step 3
 
 # ************************************************************************
 #  Interacting with the retrieved data
