@@ -217,7 +217,6 @@ classdef SWMM < handle
 	% swmm.end_sim
 
 		error = calllib('swmm5','swmm_end');
-
 		if error ~= 0
 			obj.throw_error(error);
 		end
