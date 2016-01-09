@@ -22,9 +22,10 @@
 //  Imported variables
 //-----------------------------------------------------------------------------
 #define REAL4 float
-extern REAL4* SubcatchResults;         // Results vectors defined in OUTPUT.C
-extern REAL4* NodeResults;             //  "
-extern REAL4* LinkResults;             //  "
+/* Results vectors defined in OUTPUT.C */
+extern REAL4* SubcatchResults;
+extern REAL4* NodeResults;
+extern REAL4* LinkResults;
 
 //-----------------------------------------------------------------------------
 //  Cosimulation global variables

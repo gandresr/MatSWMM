@@ -78,12 +78,22 @@ classdef SWMM < handle
 					'ROUGHFACTOR', 4, 'SLOPE', 5, 'BETA', 6, 'QMAX', 7, 'A1', 8, 'A2', 9, 'Q1', 10, ...
 					'Q2', 11, 'Q1OLD', 12, 'Q2OLD', 13, 'EVAPLOSSRATE', 14, 'SEEPLOSSRATE', 15, ...
 					'CAPACITYLIMITED', 16, 'SUPERCRITICAL', 17, 'HASLOSSES', 18, 'FULLSTATE', 19), ...
-				'PUMP', struct('INITSETTING', 0, 'YON', 1, 'YOFF', 2, 'XMIN', 3, 'XMAX', 4,), ...
+				'PUMP', struct('INITSETTING', 0, 'YON', 1, 'YOFF', 2, 'XMIN', 3, 'XMAX', 4), ...
 				'ORIFICE', struct('CDISCH1', 0, 'CDISCH2', 1, 'ENDCON', 2, 'CANSURCHARGE', 3, 'CSURCHARGE', 4, ...
 					'LENGTH', 5, 'SLOPE', 6, 'SURFAREA', 7), ...
 				'WEIR', struct('TYPE', 0, 'SHAPE', 1, 'CDISCH1', 2, 'CDISCH2', 3, 'ENDCON', 4, ...
 					'CANSURCHARGE', 5, 'CSURCHARGE', 6, 'LENGTH', 7, 'SLOPE', 8, 'SURFAREA', 9), ...
 				'OUTLET', struct('QCOEFF', 0, 'QEXPON', 1, 'QCURVE', 2, 'CURVETYPE', 3)));
+		conduitSection = struct(...
+			'TYPE', 0, 'CULVERTCODE', 1, 'TRANSECT', 2, 'YFULL', 3, 'WMAX', 4, 'YWMAX', 5, ...
+			'AFULL', 6, 'RFULL', 7, 'SFULL', 8, 'SMAX', 9, 'YBOT', 10, 'ABOT', 11, 'SBOT', 12, ...
+			'RBOT', 13);
+		sectionType = struct(...
+			'DUMMY', 0, 'CIRCULAR', 1, 'FILLED_CIRCULAR', 2, 'RECT_CLOSED', 3, 'RECT_OPEN', 4, ...
+			'TRAPEZOIDAL', 5, 'TRIANGULAR', 6, 'PARABOLIC', 7, 'RECT_TRIANG', 9, 'RECT_ROUND', 10, ...
+			'MOD_BASKET', 11, 'HORIZ_ELLIPSE', 12, 'VERT_ELLIPSE', 13, 'ARCH', 14, 'EGGSHAPED', 15, ...
+			'HORSESHOE', 16, 'GOTHIC', 17, 'CATENARY', 18, 'SEMIELLIPTICAL', 19, 'BASKETHANDLE', 20, ...
+			'SEMICIRCULAR', 21, 'IRREGULAR', 22, 'CUSTOM', 23, 'FORCE_MAIN', 24);
 	end
 	properties
 		elapsed_time;
@@ -317,7 +327,7 @@ classdef SWMM < handle
 		% files that are required to run a SWMM simulation.
 		%
 		% swmm.ask_files() - The paths to the input and changes file
-		% are requested through the command windows
+		% are requested through the command window
 		%
 		% swmm.ask_files(cell)
 		%
@@ -338,6 +348,7 @@ classdef SWMM < handle
 				fprintf('\n--- MatSWMM 2 - Succesfully initialized ---\n');
 				fprintf('\nPlease enter the path to the SWMM input file (.inp)\n');
 				obj.inp = input('Path (.inp): ', 's');
+				if isequal(obj.inp, '') throw(obj.errors.ERROR_PATH); end
 				fprintf('\nPlease enter the path to the changes file\n');
 				fprintf('\n[Press enter if you do not want to include changes]\n');
 				obj.changes = input('Path to changes: ', 's');
@@ -458,12 +469,12 @@ classdef SWMM < handle
 		%* swmm.set *
 		% TODO - Complete documentation
 		%
-		% swmm.get(swmmType, swmmProp, values)
-		% swmm.get(swmmType, swmmSubType, swmmProp, values)
-		% swmm.get(ID, swmmType, swmmProp, values)
-		% swmm.get(IDs, swmmType, swmmProp, values)
-		% swmm.get(ID, swmmType, swmmSubType, swmmProp, values)
-		% swmm.get(IDs, swmmType, swmmSubType, swmmProp, values)
+		% swmm.set(swmmType, swmmProp, values)
+		% swmm.set(swmmType, swmmSubType, swmmProp, values)
+		% swmm.set(ID, swmmType, swmmProp, values)
+		% swmm.set(IDs, swmmType, swmmProp, values)
+		% swmm.set(ID, swmmType, swmmSubType, swmmProp, values)
+		% swmm.set(IDs, swmmType, swmmSubType, swmmProp, values)
 		%
 		% swmmType: type of object(s) that is(are) going
 		% to be requested.
@@ -523,6 +534,78 @@ classdef SWMM < handle
 			valuesPtr = libpointer('doublePtr', values);
 			error = calllib('swmm5', 'swmm_set', idsPtr, valuesPtr, swmmProp, swmmType, swmmSubType);
 			if (error ~= 0) obj.throw_error(error);	end
+		end
+
+		function save_modification(obj, varargin)
+		% TODO - documentation
+		% swmm.save_modification(swmmType, swmmProp, values) % Type A
+		% swmm.save_modification(swmmType, swmmSubType, swmmProp, values) % Type B
+		% swmm.save_modification(ID, swmmType, swmmProp, values) % Type C
+		% swmm.save_modification(IDs, swmmType, swmmProp, values) % Type C
+		% swmm.save_modification(ID, swmmType, swmmSubType, swmmProp, values) % Type D
+		% swmm.save_modification(IDs, swmmType, swmmSubType, swmmProp, values) % Type D
+			ids = {};
+			getAll = false;
+			if isequal(obj.inp, '') ask_files; end
+			if isequal(obj.changes, '') obj.changes = strrep(lower(obj.inp), '.inp', '.txt'); end
+
+			% TODO - change any file termination by .txt
+			changes = fopen(obj.changes, 'a'); % Append to the end of the file
+
+			if isa(varargin{1}, 'char')
+				ids{1} = varargin{1};
+			elseif isa(varargin{1}, 'cell')
+				ids = varargin{1};
+			end
+
+			if isa(varargin{1}, 'double') getAll = true; end
+
+			if getAll
+				if nargin == 4
+					chType = 'A';
+					values = varargin{3};
+				elseif nargin == 5
+					chType = 'B';
+					values = varargin{4};
+				end
+			else
+				if nargin == 5
+					chType = 'C';
+					values = varargin{4};
+				elseif nargin == 6
+					chType = 'D';
+					values = varargin{5};
+				end
+			end
+
+			if isequal(chType, 'A')
+				if all(values == values(1))
+					fprintf(changes, '%s\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, values(1));
+				else
+					for i=1 : length(values)
+						fprintf(changes, '%s\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, values(i));
+					end
+				end
+			elseif isequal(chType, 'B')
+				if all(values == values(1))
+					fprintf(changes, '%s\t%d\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, varargin{3}, values(1));
+				else
+					for i=1 : length(values)
+						fprintf(changes, '%s\t%d\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, varargin{3}, values(i));
+					end
+				end
+			elseif isequal(chType, 'C')
+				for i=1 : length(ids)
+					fprintf(changes, '%s\t%s\t%d\t%d\t%f\n', chType, ids(i), varargin{2}, varargin{3}, values(i));
+				end
+			elseif isequal(chType, 'D')
+				for i=1 : length(ids)
+					fprintf(changes, '%s\t%s\t%d\t%d\t%d\t%f\n', chType, ids(i), varargin{2}, varargin{3}, varargin{4}, values(i));
+				end
+			end
+
+			fclose(changes);
+
 		end
 
 		function save_results(obj)
