@@ -40,14 +40,6 @@ int idxPump[Nlinks[PUMP]];
 int idxOrifice[Nlinks[ORIFICE]];
 int idxWeir[Nlinks[WEIR]];
 int idxOutlet[Nlinks[OUTLET]];
-// List of IDs per type
-char ** nodesIDs, linksIDs, subcatchIDs;
-int typesInitialized[3] = {0, 0, 0};
-// List of IDs per sub-category
-char ** outfallIDs, storageIDs, dividerIDs;
-int nodeTypesInitialized[3] = {/* Outfall */0, /* Storage */0, /* Divider */0};
-char ** conduitIDs, pumpIDs, orificeIDs, weirIDs, outletIDs;
-int linkTypesInitialized[5] = {/* Conduit */0, /* Pump */0, /* Orifice */0, /* Weir */0, /* Outlet */0};
 
 /****************************************************************************
  *
@@ -119,127 +111,35 @@ void c_store_ids() {
  * Outputs: None
  */
 void c_get_all(char **idsPtr, int swmmType, int swmmSubType) {
-	int i;
-	int lenIdsPtr = c_get_nobjects(swmmType, swmmSubType);
+	int i, lenIdsPtr;
+	lenIdsPtr = c_get_nobjects(swmmType, swmmSubType);
 
 	for(i = 0; i < lenIdsPtr; i++) {
 		if (swmmType == NODE) {
-			if (swmmSubType == -1 || swmmSubType == JUNCTION)
-				if (typesInitialized[0]) {
-					idsPtr = nodesIDs;
-					break;
-				}
+			if (swmmSubType == -1 || swmmSubType == JUNCTION) {
 				idsPtr[i] = Node[i].id;
-				if (i == 0) {
-					nodesIDs = idsPtr;
-					typesInitialized[0] = 1;
-				}
-			}
-			else if (swmmSubType == OUTFALL) {
-				if (nodeTypesInitialized[0]) {
-					idsPtr = outfallIDs;
-					break;
-				}
+			} else if (swmmSubType == OUTFALL) {
 				idsPtr[i] = Node[idxOutfall[i]].id;
-				if (i == 0) {
-					outfallIDs = idsPtr;
-					nodeTypesInitialized[0] = 1;
-				}
-			}
-			else if (swmmSubType == STORAGE) {
-				if (nodeTypesInitialized[1]) {
-					idsPtr = storageIDs;
-					break;
-				}
+			} else if (swmmSubType == STORAGE) {
 				idsPtr[i] = Node[idxStorage[i]].id;
-				if (i == 0) {
-					storageIDs = idsPtr;
-					nodeTypesInitialized[1] = 1;
-				}
-			}
-			else if (swmmSubType == DIVIDER) {
-				if (nodeTypesInitialized[2]) {
-					idsPtr = dividerIDs;
-					break;
-				}
+			} else if (swmmSubType == DIVIDER) {
 				idsPtr[i] = Node[idxDivider[i]].id;
-				if (i == 0) {
-					dividerIDs = idsPtr;
-					nodeTypesInitialized[2] = 1;
-				}
 			}
 		} else if (swmmType == LINK) {
-			if (swmmSubType == -1) {
-				if (typesInitialized[1]) {
-					idsPtr = linksIDs;
-					break;
-				}
 				idsPtr[i] = Link[i].id;
-				if (i == 0) {
-					linksIDs = idsPtr;
-					typesInitialized[1] = 1;
-				}
 			} else if (swmmSubType == CONDUIT) {
-				if (linkTypesInitialized[0]) {
-					idsPtr = conduitIDs;
-					break;
-				}
 				idsPtr[i] = Link[idxConduit[i]].id;
-				if (i == 0) {
-					conduitIDs = idsPtr;
-					linkTypesInitialized[0] = 1;
-				}
 			} else if (swmmSubType == PUMP) {
-				if (linkTypesInitialized[1]) {
-					idsPtr = pumpIDs;
-					break;
-				}
 				idsPtr[i] = Link[idxPump[i]].id;
-				if (i == 0) {
-					pumpIDs = idsPtr;
-					linkTypesInitialized[1] = 1;
-				}
 			} else if (swmmSubType == ORIFICE) {
-				if (linkTypesInitialized[2]) {
-					idsPtr = orificeIDs;
-					break;
-				}
 				idsPtr[i] = Link[idxOrifice[i]].id;
-				if (i == 0) {
-					orificeIDs = idsPtr;
-					linkTypesInitialized[2] = 1;
-				}
 			} else if (swmmSubType == WEIR) {
-				if (linkTypesInitialized[3]) {
-					idsPtr = weirIDs;
-					break;
-				}
 				idsPtr[i] = Link[idxWeir[i]].id;
-				if (i == 0) {
-					weirIDs = idsPtr;
-					linkTypesInitialized[3] = 1;
-				}
 			} else if (swmmSubType == OUTLET) {
-				if (linkTypesInitialized[4]) {
-					idsPtr = outletIDs;
-					break;
-				}
 				idsPtr[i] = Link[idxOutlet[i]].id;
-				if (i == 0) {
-					outletIDs = idsPtr;
-					linkTypesInitialized[4] = 1;
-				}
 			}
 		} else if (swmmType == SUBCATCH) {
-			if (typesInitialized[2]) {
-				idsPtr = subcatchIDs;
-				break;
-			}
 			idsPtr[i] = Subcatch[i].id;
-			if (i == 0) {
-				subcatchIDs = idsPtr;
-				typesInitialized[2] = 1;
-			}
 		}
 	}
 }
@@ -249,11 +149,260 @@ void c_get_all(char **idsPtr, int swmmType, int swmmSubType) {
  * Purpose:
  * Output:
  */
-int c_get(char **idsPtr, double *valuesPtr, int swmmProp, int swmmType, int swmmSubType)
-{
+int c_get(char **idsPtr, int lenIdsPtr, double *valuesPtr,
+	int swmmProp, int swmmType, int swmmSubType, int units, int t) {
+	// TODO - Convert units, define conversion factor
+	int i, j, k;
+	// Weighting time factor
+    double f = (reportTime - OldRoutingTime) / (NewRoutingTime - OldRoutingTime);
 
+	for (i = 0; i < lenIdsPtr; i++) {
+		if (IsOpenFlag) {
+			if (swmmType == SUBCATCH) {
+				j = project_findObject(SUBCATCH, idsPtr[i]);
 
-	return C_ERROR_NFOUND; /*Object not found*/
+				if (t == -1) subcatch_getResults(j, f, SubcatchResults);
+				else output_readSubcatchResults(t, j);
+
+				/* Results */
+				if (swmmProp == SUBCATCH_RAINFALL) {
+					valuesPtr[i] = SubcatchResults[SUBCATCH_RAINFALL];
+				} else if (swmmProp == SUBCATCH_SNOWDEPTH) {
+					valuesPtr[i] = SubcatchResults[SUBCATCH_SNOWDEPTH];
+				} else if (swmmProp == SUBCATCH_EVAP) {
+					valuesPtr[i] = SubcatchResults[SUBCATCH_EVAP];
+				} else if (swmmProp == SUBCATCH_INFIL) {
+					valuesPtr[i] = SubcatchResults[SUBCATCH_INFIL];
+				} else if (swmmProp == SUBCATCH_RUNOFF) {
+					valuesPtr[i] = SubcatchResults[SUBCATCH_RUNOFF];
+				} else if (swmmProp == SUBCATCH_WASHOFF) {
+					// TODO - Handle Qual!!
+					return C_ERROR_ATR;
+				/* Properties */
+				} else if (swmmProp == C_GAGE) {
+					valuesPtr[i] = Subcatch[j].gage;
+				} else if (swmmProp == C_OUTNODE) {
+					valuesPtr[i] = Subcatch[j].outNode;
+				} else if (swmmProp == C_OUTSUBCATCH) {
+					valuesPtr[i] = Subcatch[j].outSubcatch;
+				} else if (swmmProp == C_INFIL) {
+					valuesPtr[i] = Subcatch[j].infil;
+				} else if (swmmProp == C_WIDTH) {
+					valuesPtr[i] = Subcatch[j].width;
+				} else if (swmmProp == C_AREA) {
+					valuesPtr[i] = Subcatch[j].area;
+				} else if (swmmProp == C_FRACIMPERV) {
+					valuesPtr[i] = Subcatch[j].fracImperv;
+				} else if (swmmProp == C_SLOPE) {
+					valuesPtr[i] = Subcatch[j].slope;
+				} else if (swmmProp == C_CURBLENGTH) {
+					valuesPtr[i] = Subcatch[j].curbLength;
+				} else if (swmmProp == C_INITBUILDUP) {
+					valuesPtr[i] = Subcatch[j].initBuildup;
+				} else if (swmmProp == C_LIDAREA) {
+					valuesPtr[i] = Subcatch[j].lidArea;
+				} else {
+					return C_ERROR_ATR;
+				}
+			} else if (swmmType == NODE) {
+				j =	project_findObject(NODE, idsPtr[i]);
+
+				if (t == -1) node_getResults(j, f, NodeResults);
+				else output_readNodeResults(t, j);
+
+				/* Results */
+				if (swmmProp == NODE_DEPTH) {
+					valuesPtr[i] = NodeResults[NODE_DEPTH];
+				} else if (swmmProp == NODE_HEAD) {
+					valuesPtr[i] = NodeResults[NODE_HEAD];
+				} else if (swmmProp == NODE_VOLUME) {
+					valuesPtr[i] = NodeResults[NODE_VOLUME];
+				} else if (swmmProp == NODE_LATFLOW) {
+					valuesPtr[i] = NodeResults[NODE_LATFLOW];
+				} else if (swmmProp == NODE_INFLOW) {
+					valuesPtr[i] = NodeResults[NODE_INFLOW];
+				} else if (swmmProp == NODE_OVERFLOW) {
+					valuesPtr[i] = NodeResults[NODE_OVERFLOW];
+				} else if (swmmProp == NODE_QUAL) {
+					// TODO - Handle Qual!!
+					return C_ERROR_ATR;
+				/* Properties */
+				} else if (swmmProp == C_INVERTELEV) {
+					valuesPtr[i] = Node[j].invertElev;
+				} else if (swmmProp == C_INITDEPTH) {
+					valuesPtr[i] = Node[j].initDepth;
+				} else if (swmmProp == C_FULLDEPTH) {
+					valuesPtr[i] = Node[j].fullDepth;
+				} else if (swmmProp == C_SURDEPTH) {
+					valuesPtr[i] = Node[j].surDepth;
+				} else if (swmmProp == C_PONDEDAREA) {
+					valuesPtr[i] = Node[j].pondedArea;
+				} else if (swmmProp == C_DEGREE) {
+					valuesPtr[i] = Node[j].degree;
+				} else if (swmmProp == C_CROWNELEV) {
+					valuesPtr[i] = Node[j].crownElev;
+				} else if (swmmProp == C_LOSSES) {
+					valuesPtr[i] = Node[j].losses;
+				} else if (swmmProp == C_FULLVOLUME) {
+					valuesPtr[i] = Node[j].fullVolume;
+				}  else {
+					return C_ERROR_ATR;
+				}
+			} else if (swmmType == LINK) {
+				j =	project_findObject(LINK, idsPtr[i]);
+
+				if (t == -1) link_getResults(j, f, LinkResults);
+				else output_readLinkResults(t, j);
+
+				/* Results */
+				if (swmmProp == LINK_FLOW) {
+					valuesPtr[i] = LinkResults[LINK_FLOW];
+				} else if (swmmProp == LINK_DEPTH) {
+					valuesPtr[i] = LinkResults[LINK_DEPTH];
+				} else if (swmmProp == LINK_VELOCITY) {
+					valuesPtr[i] = LinkResults[LINK_VELOCITY];
+				} else if (swmmProp == LINK_VOLUME) {
+					valuesPtr[i] = LinkResults[LINK_VOLUME];
+				} else if (swmmProp == LINK_CAPACITY) {
+					valuesPtr[i] = LinkResults[LINK_CAPACITY];
+				} else if (swmmProp == LINK_QUAL) {
+					// TODO - Handle Qual!!
+					return C_ERROR_ATR;
+				/* Properties */
+				} else if (swmmProp == C_NODE1) {
+					valuesPtr[i] = Link[j].node1;
+				} else if (swmmProp == C_NODE2) {
+					valuesPtr[i] = Link[j].node2;
+				} else if (swmmProp == C_OFFSET1) {
+					valuesPtr[i] = Link[j].offset1;
+				} else if (swmmProp == C_OFFSET2) {
+					valuesPtr[i] = Link[j].offset2;
+				} else if (swmmProp == C_XSECT) {
+					/* TODO - Handle Xsect */
+					return C_ERROR_ATR;
+				} else if (swmmProp == C_Q0) {
+					valuesPtr[i] = Link[j].q0;
+				} else if (swmmProp == C_QLIMIT) {
+					valuesPtr[i] = Link[j].qLimit;
+				} else if (swmmProp == C_CLOSSINLET) {
+					valuesPtr[i] = Link[j].clossInlet;
+				} else if (swmmProp == C_CLOSSOUTLET) {
+					valuesPtr[i] = Link[j].clossOutlet;
+				} else if (swmmProp == C_CLOSSAVG) {
+					valuesPtr[i] = Link[j].clossAvg;
+				} else if (swmmProp == C_SEEPRATE) {
+					valuesPtr[i] = Link[j].seepRate;
+				} else if (swmmProp == C_HASFLAPGATE) {
+					valuesPtr[i] = Link[j].hasFlapGate;
+				} else if (swmmProp == C_SURFAREA1) {
+					valuesPtr[i] = Link[j].surfArea1;
+				} else if (swmmProp == C_SURFAREA2) {
+					valuesPtr[i] = Link[j].surfArea2;
+				} else if (swmmProp == C_QFULL) {
+					valuesPtr[i] = Link[j].qFull;
+				} else if (swmmProp == C_SETTING) {
+					valuesPtr[i] = Link[j].setting;
+				} else if (swmmProp == C_FROUDE) {
+					valuesPtr[i] = Link[j].froude;
+				} else if (swmmProp == C_FLOWCLASS) {
+					valuesPtr[i] = Link[j].flowClass;
+				} else if (swmmProp == C_DQDH) {
+					valuesPtr[i] = Link[j].dqdh;
+				} else if (swmmProp == C_DIRECTION) {
+					valuesPtr[i] = Link[j].direction;
+				/* Sub-properties */
+				} else if (swmmSubType != CONDUIT) {
+					k = Link[j].subIndex; // Index for sub-category
+					if (swmmSubType == PUMP) {
+						if (swmmProp == C_INITSETTING) {
+							valuesPtr[i] = Pump[k].initSetting;
+						} else if (swmmProp == C_YON) {
+							valuesPtr[i] = Pump[k].yOn;
+						} else if (swmmProp == C_YOFF) {
+							valuesPtr[i] = Pump[k].yOff;
+						} else if (swmmProp == C_XMIN) {
+							valuesPtr[i] = Pump[k].xMin;
+						} else if (swmmProp == C_XMAX) {
+							valuesPtr[i] = Pump[k].xMax;
+						}
+					} else if (swmmSubType == ΟRIFICE) {
+						if (swmmProp == C_SHAPE) {
+							valuesPtr[i] = Orifice[k].shape;
+						} else if (swmmProp == C_CDISCH) {
+							valuesPtr[i] = Orifice[k].cDisch;
+						} else if (swmmProp == C_ORATE) {
+							valuesPtr[i] = Orifice[k].orate;
+						} else if (swmmProp == C_CORIF) {
+							valuesPtr[i] = Orifice[k].cOrif;
+						} else if (swmmProp == C_HCRIT) {
+							valuesPtr[i] = Orifice[k].hCrit;
+						} else if (swmmProp == C_CWEIR) {
+							valuesPtr[i] = Orifice[k].cWeir;
+						} else if (swmmProp == C_LENGTH) {
+							valuesPtr[i] = Orifice[k].length;
+						} else if (swmmProp == C_SURFAREA) {
+							valuesPtr[i] = Orifice[k].surfArea;
+						}
+					} else if (swmmSubType == WEIR) {
+						if (swmmProp == C_CDISCH1) {
+							valuesPtr[i] = Weir[k].cDisch1;
+						} else if (swmmProp == C_CDISCH2) {
+							valuesPtr[i] = Weir[k].cDisch2;
+						} else if (swmmProp == C_ENDCON) {
+							valuesPtr[i] = Weir[k].endCon;
+						} else if (swmmProp == C_CANSURCHARGE) {
+							valuesPtr[i] = Weir[k].canSurcharge;
+						} else if (swmmProp == C_CSURCHARGE) {
+							valuesPtr[i] = Weir[k].cSurcharge;
+						} else if (swmmProp == C_LENGTH) {
+							valuesPtr[i] = Weir[k].length;
+						} else if (swmmProp == C_SLOPE) {
+							valuesPtr[i] = Weir[k].slope;
+						} else if (swmmProp == C_SURFAREA) {
+							valuesPtr[i] = Weir[k].surfArea;
+						}
+					} else if (swmmSubType == OUTLET) {
+						if (swmmProp == C_QCOEFF) {
+							valuesPtr[i] = Outlet[k].qCoeff;
+						} else if (swmmProp == C_QEXPON) {
+							valuesPtr[i] = Outlet[k].qExpon;
+						} else if (swmmProp == C_QCURVE) {
+							valuesPtr[i] = Outlet[k].qCurve;
+						} else if (swmmProp == C_CURVETYPE) {
+							valuesPtr[i] = Outlet[k].curveType;
+						}
+					} else {
+						return C_ERROR_ATR;
+					}
+				} else {
+					return C_ERROR_ATR;
+				}
+			} else {
+				return C_ERROR_ATR;
+			}
+		} else {
+			return C_ERROR_NRUNNING;
+		}
+	}
+	return 0;
+}
+
+int c_get_results(char **idsPtr, int lenIdsPtr, double ** valuesPtrPtr,
+	int swmmProp, int swmmType, int swmmSubType, int units) {
+
+	int period, error;
+	double valuesPtr[lenIdsPtr]; // Rows
+
+	if (IsOpenFlag && !IsStartedFlag) {
+		for ( period = 0; period <= Nperiods; period++ ) {
+			error = c_get(idsPtr, lenIdsPtr, valuesPtr, swmmProp, swmmType, swmmSubType, units, period);
+			if (error != 0) return error;
+
+			valuesPtrPtr[period] = valuesPtr;
+		}
+	} else return C_ERROR_NOVER;
+
+	return 0;
 }
 
 /*
