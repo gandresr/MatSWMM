@@ -2,9 +2,8 @@
 
 ### What is this repository for? ###
 
-* Project:  SWMM 5.1 Matlab Toolbox
-* Version:  0.0.1
-* Date:     06/25/14  
+* Project:  MatSWMM
+* Version:  2.0
 * Author:   Gerardo Andrés Riaño Briceño (Universidad de los Andes - GIAP http://giap.uniandes.edu.co)
 
 This is a matlab toolbox with basic functions to compute cosimulation processes with SWMM. The main goal of this module is to allow its users to design optimization models and real time control systems, for drainage systems.
