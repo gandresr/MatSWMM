@@ -161,6 +161,7 @@ int c_get(char **idsPtr, int lenIdsPtr, double *valuesPtr,
 		if (IsOpenFlag) {
 			if (swmmType == SUBCATCH) {
 				j = project_findObject(SUBCATCH, idsPtr[i]);
+				if(j < 0) return C_ERROR_NFOUND;
 
 				if (t == -1) subcatch_getResults(j, f, SubcatchResults);
 				else output_readSubcatchResults(t, j);
@@ -207,6 +208,7 @@ int c_get(char **idsPtr, int lenIdsPtr, double *valuesPtr,
 				}
 			} else if (swmmType == NODE) {
 				j =	project_findObject(NODE, idsPtr[i]);
+				if(j < 0) return C_ERROR_NFOUND;
 
 				if (t == -1) node_getResults(j, f, NodeResults);
 				else output_readNodeResults(t, j);
@@ -251,6 +253,7 @@ int c_get(char **idsPtr, int lenIdsPtr, double *valuesPtr,
 				}
 			} else if (swmmType == LINK) {
 				j =	project_findObject(LINK, idsPtr[i]);
+				if(j < 0) return C_ERROR_NFOUND;
 
 				if (t == -1) link_getResults(j, f, LinkResults);
 				else output_readLinkResults(t, j);
@@ -402,6 +405,42 @@ int c_get_results(char **idsPtr, int lenIdsPtr, double ** valuesPtrPtr,
 			valuesPtrPtr[period] = valuesPtr;
 		}
 	} else return C_ERROR_NOVER;
+
+	return 0;
+}
+
+int c_set(char **idsPtr, int lenIdsPtr, double * valuesPtr,
+	int swmmProp, int swmmType, int swmmSubType, int units) {
+// TODO - documentation
+
+	int j, k;
+
+	if (swmmType == LINK) {
+		j = project_findObject(LINK, id);
+		if(j < 0) return C_ERROR_NFOUND;
+		for (i = 0; i < lenIdsPtr; i++) {
+			if (swmmProp == C_SETTING) {
+				Link[j].targetSetting = valuesPtr[i];
+				link_setSetting(j, 0);
+			} else if (swmmType == CONDUIT) {
+				k = Link[j].subIndex;
+				if (swmmProp == LENGTH) {
+					Conduit[k].length    = valuesPtr[j] / UCF(LENGTH);
+					Conduit[k].modLength = Conduit[k].length;
+				} else if (swmmProp == C_ROUGHNESS)
+				Conduit[k].roughness = valuesPtr[j];
+				Link[j].offset1      = valuesPtr[j] / UCF(LENGTH);
+				Link[j].offset2      = valuesPtr[j] / UCF(LENGTH);
+				Link[j].q0           = valuesPtr[j] / UCF(FLOW);
+				Link[j].qLimit       = valuesPtr[j] / UCF(FLOW);
+			} else if (swmmType == ) {
+			} else if (swmmType == ) {
+			} else if (swmmType == ) {
+			} else if (swmmType == ) {
+		}
+	} else {
+		return C_ERROR_ATR;
+	}
 
 	return 0;
 }

@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------------------
-//   cosimulation.h
+//  cosimulation.h
 //	(Universidad de los Andes - GIAP)
 //
 //   Project:  MatSWMM 2
@@ -13,10 +13,6 @@
 //    UNIT CONVERTION - For units in SI
 //=============================================================================
 
-#define CFTOCM(m) m*0.0283168466
-#define FT2TOM2(m) m*0.09290304
-#define FTTOM(m) m*0.3048
-#define FTPERSTOMMPERHR(m) m*304.8*3600
 #define LEN(x) sizeof(x)/sizeof(x[0])
 
 /************* ERROR CONSTANTS *************/

@@ -150,14 +150,107 @@ classdef SWMM < handle
 			throw(exception);
 		end
 
+		function save_modification(obj, varargin)
+		% TODO - documentation
+		% swmm.save_modification(swmmType, swmmProp, values) % Type A
+		% swmm.save_modification(swmmType, swmmSubType, swmmProp, values) % Type B
+		% swmm.save_modification(ID, swmmType, swmmProp, values) % Type C
+		% swmm.save_modification(IDs, swmmType, swmmProp, values) % Type C
+		% swmm.save_modification(ID, swmmType, swmmSubType, swmmProp, values) % Type D
+		% swmm.save_modification(IDs, swmmType, swmmSubType, swmmProp, values) % Type D
+			ids = {};
+			getAll = false;
+			if isequal(obj.inp, '') ask_files; end
+
+			% TODO - change any file termination by .txt
+			changes = fopen(obj.changes, 'a'); % Append to the end of the file
+
+			if isa(varargin{1}, 'char')
+				ids{1} = varargin{1};
+			elseif isa(varargin{1}, 'cell')
+				ids = varargin{1};
+			end
+
+			if isa(varargin{1}, 'double') getAll = true; end
+
+			if getAll
+				if nargin == 4
+					chType = 'A';
+					values = varargin{3};
+				elseif nargin == 5
+					chType = 'B';
+					values = varargin{4};
+				end
+			else
+				if nargin == 5
+					chType = 'C';
+					values = varargin{4};
+				elseif nargin == 6
+					chType = 'D';
+					values = varargin{5};
+				end
+			end
+
+			if isequal(chType, 'A')
+				if all(values == values(1))
+					fprintf(changes, '%s\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, values(1));
+				else
+					for i=1 : length(values)
+						fprintf(changes, '%s\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, values(i));
+					end
+				end
+			elseif isequal(chType, 'B')
+				if all(values == values(1))
+					fprintf(changes, '%s\t%d\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, varargin{3}, values(1));
+				else
+					for i=1 : length(values)
+						fprintf(changes, '%s\t%d\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, varargin{3}, values(i));
+					end
+				end
+			elseif isequal(chType, 'C')
+				for i=1 : length(ids)
+					fprintf(changes, '%s\t%s\t%d\t%d\t%f\n', chType, ids{i}, varargin{2}, varargin{3}, values(i));
+				end
+			elseif isequal(chType, 'D')
+				for i=1 : length(ids)
+					fprintf(changes, '%s\t%s\t%d\t%d\t%d\t%f\n', chType, ids{i}, varargin{2}, varargin{3}, varargin{4}, values(i));
+				end
+			end
+
+			fclose(changes);
+
+		end
+
 		function load_changes(obj)
 		% TODO - documentation
 			if isequal(obj.changes, '')
-				return;
+				ask_files;
 			end
 
-			% TODO - define the codification of the 'changes' file, and the algorithm to read it
-			% and save the modifications into the SWMM workspace. Define exceptions.
+			changes = fopen(obj.changes, 'r');
+			line = fgets(changes);
+
+			while ischar(line)
+				line = fgets(changes);
+				A = textscan(line, '%s'); % Cell
+				if isequal(A{1}{1}, 'A')
+					A = textscan(line, '%s\t%d\t%d\t%f\n'); % Cell
+					obj.set(A{2}, A{3}, A{4});
+				elseif isequal(A{1}{1}, 'B')
+					A = textscan(line, '%s\t%d\t%d\t%d\t%f\n'); % Cell
+					obj.set(A{2}, A{3}, A{4}, A{5});
+				elseif isequal(A{1}{1}, 'C')
+					A = textscan(line, '%s\t%s\t%d\t%d\t%f\n'); % Cell
+					obj.set(A{2}, A{3}, A{4}, A{5});
+				elseif isequal(A{1}{1}, 'D')
+					A = textscan(line, '%s\t%s\t%d\t%d\t%d\t%f\n'); % Cell
+					obj.set(A{2}, A{3}, A{4}, A{5}, , A{6});
+				end
+			end
+		end
+
+		function get_nSamples(obj)
+			% TODO - ALL
 		end
 
 		function open(obj)
@@ -350,8 +443,9 @@ classdef SWMM < handle
 				obj.inp = input('Path (.inp): ', 's');
 				if isequal(obj.inp, '') throw(obj.errors.ERROR_PATH); end
 				fprintf('\nPlease enter the path to the changes file\n');
-				fprintf('\n[Press enter if you do not want to include changes]\n');
+				fprintf('\n[If a file path is not given the changes file would be named as the input file]\n');
 				obj.changes = input('Path to changes: ', 's');
+				if isequal(obj.changes, '') obj.changes = strrep(lower(obj.inp), '.inp', '.txt'); end
 			end
 		end
 
@@ -440,11 +534,7 @@ classdef SWMM < handle
 				nObjects = calllib('swmm5', 'swmm_get_nobjects', swmmType, swmmSubType);
 				idsPtr = libpointer('stringPtrPtr', cell(1, nObjects));
 				calllib('swmm5', 'swmm_get_all', idsPtr, swmmType, swmmSubType);
-				valuesPtr = libpointer('doublePtr', zeros(1, nObjects));
-				error = calllib('swmm5', 'swmm_get', idsPtr, valuesPtr, swmmProp, swmmType, swmmSubType);
-				if (error ~= 0) obj.throw_error(error); end
 				ids = idsPtr.value;
-				values = valuesPtr.value;
 			else
 				% The parameters for the DLL are defined
 				swmmType = varargin{2};
@@ -457,8 +547,16 @@ classdef SWMM < handle
 				end
 
 				nObjects = length(ids);
+			end
+
+			if obj.is_over && obj.isRunning
+				valuesPtrPtr = libpointer('doublePtrPtr', zeros(obj.get_nSamples, nObjects));
+				error = calllib('swmm5', 'swmm_get_results', idsPtr, nObjects, valuesPtrPtr, swmmProp, swmmType, swmmSubType, obj.units);
+				if (error ~= 0) obj.throw_error(error);	end
+				values = valuesPtrPtr.value;
+			else
 				valuesPtr = libpointer('doublePtr', zeros(1, nObjects));
-				error = calllib('swmm5', 'swmm_get', idsPtr, valuesPtr, swmmProp, swmmType, swmmSubType);
+				error = calllib('swmm5', 'swmm_get', idsPtr, nObjects, valuesPtr, swmmProp, swmmType, swmmSubType, obj.units, -1);
 				if (error ~= 0) obj.throw_error(error);	end
 				values = valuesPtr.value;
 			end
@@ -531,81 +629,10 @@ classdef SWMM < handle
 				idsPtr = libpointer('stringPtrPtr', ids);
 			end
 
+			nObjects = length(ids);
 			valuesPtr = libpointer('doublePtr', values);
-			error = calllib('swmm5', 'swmm_set', idsPtr, valuesPtr, swmmProp, swmmType, swmmSubType);
+			error = calllib('swmm5', 'swmm_set', idsPtr, nObjects, valuesPtr, swmmProp, swmmType, swmmSubType, obj.units);
 			if (error ~= 0) obj.throw_error(error);	end
-		end
-
-		function save_modification(obj, varargin)
-		% TODO - documentation
-		% swmm.save_modification(swmmType, swmmProp, values) % Type A
-		% swmm.save_modification(swmmType, swmmSubType, swmmProp, values) % Type B
-		% swmm.save_modification(ID, swmmType, swmmProp, values) % Type C
-		% swmm.save_modification(IDs, swmmType, swmmProp, values) % Type C
-		% swmm.save_modification(ID, swmmType, swmmSubType, swmmProp, values) % Type D
-		% swmm.save_modification(IDs, swmmType, swmmSubType, swmmProp, values) % Type D
-			ids = {};
-			getAll = false;
-			if isequal(obj.inp, '') ask_files; end
-			if isequal(obj.changes, '') obj.changes = strrep(lower(obj.inp), '.inp', '.txt'); end
-
-			% TODO - change any file termination by .txt
-			changes = fopen(obj.changes, 'a'); % Append to the end of the file
-
-			if isa(varargin{1}, 'char')
-				ids{1} = varargin{1};
-			elseif isa(varargin{1}, 'cell')
-				ids = varargin{1};
-			end
-
-			if isa(varargin{1}, 'double') getAll = true; end
-
-			if getAll
-				if nargin == 4
-					chType = 'A';
-					values = varargin{3};
-				elseif nargin == 5
-					chType = 'B';
-					values = varargin{4};
-				end
-			else
-				if nargin == 5
-					chType = 'C';
-					values = varargin{4};
-				elseif nargin == 6
-					chType = 'D';
-					values = varargin{5};
-				end
-			end
-
-			if isequal(chType, 'A')
-				if all(values == values(1))
-					fprintf(changes, '%s\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, values(1));
-				else
-					for i=1 : length(values)
-						fprintf(changes, '%s\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, values(i));
-					end
-				end
-			elseif isequal(chType, 'B')
-				if all(values == values(1))
-					fprintf(changes, '%s\t%d\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, varargin{3}, values(1));
-				else
-					for i=1 : length(values)
-						fprintf(changes, '%s\t%d\t%d\t%d\t%f\n', chType, varargin{1}, varargin{2}, varargin{3}, values(i));
-					end
-				end
-			elseif isequal(chType, 'C')
-				for i=1 : length(ids)
-					fprintf(changes, '%s\t%s\t%d\t%d\t%f\n', chType, ids(i), varargin{2}, varargin{3}, values(i));
-				end
-			elseif isequal(chType, 'D')
-				for i=1 : length(ids)
-					fprintf(changes, '%s\t%s\t%d\t%d\t%d\t%f\n', chType, ids(i), varargin{2}, varargin{3}, varargin{4}, values(i));
-				end
-			end
-
-			fclose(changes);
-
 		end
 
 		function save_results(obj)
