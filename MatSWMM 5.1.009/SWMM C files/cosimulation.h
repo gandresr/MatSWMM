@@ -14,6 +14,7 @@
 //=============================================================================
 
 #define LEN(x) sizeof(x)/sizeof(x[0])
+#define GTRTHANZERO(x) x > 0 ? TRUE : FALSE
 
 /************* ERROR CONSTANTS *************/
 enum ErrorConstants {

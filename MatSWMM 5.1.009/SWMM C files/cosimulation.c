@@ -398,7 +398,7 @@ int c_get_results(char **idsPtr, int lenIdsPtr, double ** valuesPtrPtr,
 	double valuesPtr[lenIdsPtr]; // Rows
 
 	if (IsOpenFlag && !IsStartedFlag) {
-		for ( period = 0; period <= Nperiods; period++ ) {
+		for ( percentageriod = 0; period <= Nperiods; period++ ) {
 			error = c_get(idsPtr, lenIdsPtr, valuesPtr, swmmProp, swmmType, swmmSubType, units, period);
 			if (error != 0) return error;
 
@@ -422,26 +422,254 @@ int c_set(char **idsPtr, int lenIdsPtr, double * valuesPtr,
 			if (swmmProp == C_SETTING) {
 				Link[j].targetSetting = valuesPtr[i];
 				link_setSetting(j, 0);
-			} else if (swmmType == CONDUIT) {
+			} else if (swmmSubType == CONDUIT) {
 				k = Link[j].subIndex;
 				if (swmmProp == LENGTH) {
-					Conduit[k].length    = valuesPtr[j] / UCF(LENGTH);
+					Conduit[k].length    = valuesPtr[i] / UCF(LENGTH);
 					Conduit[k].modLength = Conduit[k].length;
-				} else if (swmmProp == C_ROUGHNESS)
-				Conduit[k].roughness = valuesPtr[j];
-				Link[j].offset1      = valuesPtr[j] / UCF(LENGTH);
-				Link[j].offset2      = valuesPtr[j] / UCF(LENGTH);
-				Link[j].q0           = valuesPtr[j] / UCF(FLOW);
-				Link[j].qLimit       = valuesPtr[j] / UCF(FLOW);
-			} else if (swmmType == ) {
-			} else if (swmmType == ) {
-			} else if (swmmType == ) {
-			} else if (swmmType == ) {
+				} else if (swmmProp == C_ROUGHNESS) {
+					Conduit[k].roughness = valuesPtr[i];
+				} else if (swmmProp == C_OFFSET1) {
+					Link[j].offset1 = valuesPtr[i] / UCF(LENGTH);
+				} else if (swmmProp == C_OFFSET2) {
+					Link[j].offset2 = valuesPtr[i] / UCF(LENGTH);
+				} else if (swmmProp == C_Q0) {
+					Link[j].q0 = valuesPtr[i] / UCF(FLOW);
+				} else if (swmmProp == C_QLIMIT) {
+					Link[j].qLimit = valuesPtr[i] / UCF(FLOW);
+				} else {
+					return C_ERROR_ATR;
+				}
+			} else if (swmmSubType == PUMP) {
+				if (swmmProp == C_HASFLAPGATE) {
+		        	Link[j].hasFlapGate  = GTHANZERO(valuesPtr[i]);
+				} else if (swmmProp == C_INITSETTING) {
+        			Pump[k].initSetting  = valuesPtr[i];
+				} else if (swmmProp == C_YON) {
+					Pump[k].yOn = valuesPtr[i] / UCF(LENGTH);
+				} else if (swmmProp == C_YOFF) {
+        			Pump[k].yOff = valuesPtr[i] / UCF(LENGTH);
+				} else if (swmmProp == C_XMIN) {
+					Pump[k].xMin = valuesPtr[i];
+				} else if (swmmProp == C_XMAX) {
+					Pump[k].xMax = valuesPtr[i];
+				} else {
+					return C_ERROR_ATR;
+				}
+			} else if (swmmSubType == ORIFICE) {
+				if (swmmProp == C_OFFSET1 || swmmProp == C_OFFSET2) {
+					Link[j].offset1 = valuesPtr[i] / UCF(LENGTH);
+					Link[j].offset2 = Link[j].offset1;
+				} else if (swmmProp == C_CDISCH) {
+					Orifice[k].cDisch = valuesPtr[i];
+				} else if (swmmProp == C_HASFLAPGATE) {
+					Link[j].hasFlapGate = GTHANZERO(valuesPtr[i]);
+				} else if (swmmProp == C_ORATE) {
+					Orifice[k].orate = valuesPtr[i];
+				}
+			} else if (swmmSubType == WEIR) {
+				if (swmmProp == C_OFFSET1 || swmmProp == C_OFFSET2) {
+			        Link[j].offset1 = valuesPtr[i] / UCF(LENGTH);
+			        Link[j].offset2 = Link[j].offset1;
+			    } else if (swmmProp == C_CDISCH1) {
+		        	Weir[k].cDisch1 = valuesPtr[i];
+			    } else if (swmmProp == C_HASFLAPGATE) {
+		        	Link[j].hasFlapGate  = GTHANZERO(valuesPtr[i]);
+			    } else if (swmmProp == C_ENDCON) {
+			        Weir[k].endCon = valuesPtr[i];
+			    } else if (swmmProp == C_CDISCH2) {
+		        	Weir[k].cDisch2 = valuesPtr[i];
+			    } else if (swmmProp == C_CANSURCHARGE) {
+		        	Weir[k].canSurcharge = GTHANZERO(valuesPtr[i]);
+			    }
+			} else if (swmmSubType == OUTLET) {
+				if (swmmProp == C_OFFSET1 || swmmProp == C_OFFSET2) {
+					Link[j].offset1 =  valuesPtr[i] / UCF(LENGTH);
+					Link[j].offset2 = Link[j].offset1;
+				} else if (swmmProp == C_QCOEFF) {
+					Outlet[k].qCoeff = valuesPtr[i];
+				} else if (swmmProp == C_QEXPON) {
+					Outlet[k].qExpon = valuesPtr[i];
+				} else if (swmmProp == C_QCURVE) {
+					Outlet[k].qCurve = (int)valuesPtr[i];
+				} else if (swmmProp == C_HASFLAPGATE) {
+					Link[j].hasFlapGate = GTHANZERO(valuesPtr[i]);
+				} else if (swmmProp == C_CURVETYPE) {
+					Outlet[k].curveType = (int)valuesPtr[i];
+				}
+			} else if (swmmSubType == C_XSECTION) {
+				if (swmmProp == C_TYPE) {
+					Link[j].xsect.type = (int)valuesPtr[i];
+				} else { // -- TODO - ADD UCF TO OMIT IT WHEN OPERATING WITH STORED VALUES
+					int xsectType = Link[j].xsect.type;
+					if (xsectType == CIRCULAR) {
+						if (swmmProp == C_DIAMETER) {
+							double p[1];
+							p[0] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == FORCE_MAIN) {
+						if (swmmProp == C_DIAMETER) {
+							double p[2];
+							p[0] = valuesPtr[i];
+							p[1] = Link[j].xsect.rBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == FILLED_CIRCULAR) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[2];
+							p[0] = valuesPtr[i];
+							p[1] = Link[j].xsect.yBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_FILLED_DEPTH) {
+							double p[2];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == EGGSHAPED || xsectType == HORSESHOE || xsectType == GOTHIC
+						|| xsectType == CATENARY || xsectType == SEMIELLIPTICAL|| xsectType == BASKETHANDLE
+						|| xsectType == SEMICIRCULAR) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[1];
+							p[0] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == RECT_CLOSED || xsectType == TRIANGULAR
+						 || xsectType == PARABOLIC) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[2];
+							p[0] = valuesPtr[i];
+							p[1] = Link[j].xsect.wMax;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_MAX_WIDTH) {
+							double p[2];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == RECT_OPEN) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[3];
+							p[0] = valuesPtr[i];
+							p[1] = Link[j].xsect.wMax;
+							p[2] = Link[j].xsect.sBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_MAX_WIDTH) {
+							double p[3];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = valuesPtr[i];
+							p[2] = Link[j].xsect.sBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_SIDES_REMOVED) {
+							double p[2];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = Link[j].xsect.wMax;
+							p[2] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == RECT_TRIANG || xsectType == RECT_ROUND
+						|| xsectType == MOD_BASKET) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[3];
+							p[0] = valuesPtr[i];
+							p[1] = Link[j].xsect.wMax;
+							p[2] = Link[j].xsect.yBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_MAX_WIDTH) {
+							double p[3];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = valuesPtr[i];
+							p[2] = Link[j].xsect.yBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_ADDITIONAL_DEPTH) {
+							double p[2];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = Link[j].xsect.wMax;
+							p[2] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == TRAPEZOIDAL) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[4];
+							p[0] = valuesPtr[i]; // Max. depth
+							p[1] = Link[j].xsect.yBot; // Bottom width
+							p[2] = Link[j].xsect.sBot; // Slope 1
+							p[3] = Link[j].xsect.sBot; // Slope 2
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_BOTTOM_WIDTH) {
+							double p[4];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = valuesPtr[i];
+							p[2] = Link[j].xsect.sBot;
+							p[3] = Link[j].xsect.sBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_LEFT_SLOPE) {
+							double p[4];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = Link[j].xsect.yBot;
+							p[2] = valuesPtr[i];
+							p[3] = Link[j].xsect.sBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_RIGHT_SLOPE) {
+							double p[4];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = Link[j].xsect.yBot;
+							p[2] = Link[j].xsect.sBot;
+							p[3] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else if (xsectType == POWERFUNC) {
+						if (swmmProp == C_MAX_DEPTH) {
+							double p[3];
+							p[0] = valuesPtr[i];
+							p[1] = Link[j].xsect.wMax;
+							p[2] = 1. / Link[j].xsect.sBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_MAX_WIDTH) {
+							double p[3];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = valuesPtr[i];
+							p[2] = 1. / Link[j].xsect.sBot;
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else if (swmmProp == C_POWER) {
+							double p[3];
+							p[0] = Link[j].xsect.yFull;
+							p[1] = Link[j].xsect.wMax;
+							p[2] = valuesPtr[i];
+							xsect_setParams(&Link[j].xsect, xsectType, p, UCF(LENGTH));
+						} else {
+							return C_ERROR_ATR;
+						}
+					} else {
+						return C_ERROR_ATR;
+					}
+				}
+			} else {
+				return C_ERROR_ATR;
+			}
 		}
+	} else if (swmmType == NODE) {
+
 	} else {
 		return C_ERROR_ATR;
 	}
-
 	return 0;
 }
 
@@ -465,6 +693,7 @@ int c_saveResults()
 	char path[25];
 	char* extention = ".csv";
 	char s[30];
+
 	long time_val = 0;
 	mkdir("Subcatchments", "w");
 	mkdir("Links", "w");
