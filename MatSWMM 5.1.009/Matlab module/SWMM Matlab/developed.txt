@@ -1,0 +1,17 @@
+Developed | Function
+--------- + -------------------------
+    1     | swmm_open
+    1     | swmm_start
+    1     | swmm_end
+    1     | swmm_getMassBalErr
+    1     | swmm_report
+    1     | swmm_close
+    1     | swmm_step
+    1     | swmm_get_nobjects
+    1     | swmm_store_ids
+    1     | swmm_get_all
+    1     | swmm_get
+    1     | swmm_get_results
+    0     | swmm_set
+    0     | swmm_save_results
+    0     | swmm_update_flooding

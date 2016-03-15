@@ -464,7 +464,9 @@ classdef SWMM < handle
   %* swmm_modidfy_input *
   %
   % This MatSWMM function modifies a specific attribute from the
-  % input file
+  % input file. Currently it is only compatible with the following
+  % parameters:
+  % INVERT (nodes), DEPTH (nodes, links)
   %
   % swmm.modify_input(p, id, attr, val)
   %
@@ -632,7 +634,7 @@ classdef SWMM < handle
   elseif object_type == obj.SUBCATCH
   folder = 'Subcatchments/';
   compatible = [obj.PRECIPITATION, obj.RUNOFF];
-  columns = [1, 4];
+  columns = [1, 3];
   else
   throw(obj.ERROR_MSG_TYPE);
   end
