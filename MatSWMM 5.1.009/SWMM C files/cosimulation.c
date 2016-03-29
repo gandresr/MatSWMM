@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------------------
-//   cosimulation.c
+//  cosimulation.c
 //	(Universidad de los Andes - GIAP)
 //
 //   Project:  MatSWMM 2
@@ -79,7 +79,7 @@ int c_get_nobjects(int swmmType, int swmmSubType) {
 /**
  * Inputs: None
  * Purpose: It saves the indexes related to the objects with
- * sub-category in Node[] a Link[].
+ * sub-category in Node[] and Link[].
  * Outputs: None
  */
 void c_store_ids() {

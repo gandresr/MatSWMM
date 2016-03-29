@@ -244,7 +244,7 @@ classdef SWMM < handle
 					obj.set(A{2}, A{3}, A{4}, A{5});
 				elseif isequal(A{1}{1}, 'D')
 					A = textscan(line, '%s\t%s\t%d\t%d\t%d\t%f\n'); % Cell
-					obj.set(A{2}, A{3}, A{4}, A{5}, , A{6});
+					obj.set(A{2}, A{3}, A{4}, A{5}, A{6});
 				end
 			end
 		end
@@ -288,10 +288,10 @@ classdef SWMM < handle
 			obj.elapsed_time = 1e-6;
 			obj.timePtr = libpointer('doublePtr', obj.elapsed_time);
 
-			error = calllib('swmm5', 'swmm_store_ids');
-			if (error ~= 0) obj.throw_error(error); end
+			%error = calllib('swmm5', 'swmm_store_ids');
+			%if (error ~= 0) obj.throw_error(error); end
 
-			obj.load_changes;
+			%obj.load_changes;
 			obj.isRunning = true;
 		end
 
@@ -441,11 +441,11 @@ classdef SWMM < handle
 				fprintf('\n--- MatSWMM 2 - Succesfully initialized ---\n');
 				fprintf('\nPlease enter the path to the SWMM input file (.inp)\n');
 				obj.inp = input('Path (.inp): ', 's');
-				if isequal(obj.inp, '') throw(obj.errors.ERROR_PATH); end
+				if isequal(obj.inp, ''), throw(obj.errors.ERROR_PATH); end
 				fprintf('\nPlease enter the path to the changes file\n');
 				fprintf('\n[If a file path is not given the changes file would be named as the input file]\n');
 				obj.changes = input('Path to changes: ', 's');
-				if isequal(obj.changes, '') obj.changes = strrep(lower(obj.inp), '.inp', '.txt'); end
+				if isequal(obj.changes, ''), obj.changes = strrep(lower(obj.inp), '.inp', '.txt'); end
 			end
 		end
 
@@ -506,7 +506,7 @@ classdef SWMM < handle
 		%     swmmProp = swmm.types.objects.LINK
 		%     swmmProp = swmm.types.objects.NODE
 
-			if (~obj.isRunning) throw(obj.errors.ERROR_NRUNNING); end
+			if (~obj.isRunning), throw(obj.errors.ERROR_NRUNNING); end
 			ids = {};
 			getAll = false;
 
@@ -547,18 +547,6 @@ classdef SWMM < handle
 				end
 
 				nObjects = length(ids);
-			end
-
-			if obj.is_over && obj.isRunning
-				valuesPtrPtr = libpointer('doublePtrPtr', zeros(obj.get_nSamples, nObjects));
-				error = calllib('swmm5', 'swmm_get_results', idsPtr, nObjects, valuesPtrPtr, swmmProp, swmmType, swmmSubType, obj.units);
-				if (error ~= 0) obj.throw_error(error);	end
-				values = valuesPtrPtr.value;
-			else
-				valuesPtr = libpointer('doublePtr', zeros(1, nObjects));
-				error = calllib('swmm5', 'swmm_get', idsPtr, nObjects, valuesPtr, swmmProp, swmmType, swmmSubType, obj.units, -1);
-				if (error ~= 0) obj.throw_error(error);	end
-				values = valuesPtr.value;
 			end
 		end
 

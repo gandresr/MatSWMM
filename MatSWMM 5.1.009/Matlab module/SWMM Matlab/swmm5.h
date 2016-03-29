@@ -33,8 +33,8 @@
 // --- use "C" linkage for C++ programs
 
 #ifdef __cplusplus
-extern "C" { 
-#endif 
+extern "C" {
+#endif
 
 int  DLLEXPORT   swmm_run(char* f1, char* f2, char* f3);
 int  DLLEXPORT   swmm_open(char* f1, char* f2, char* f3);
@@ -48,16 +48,15 @@ int  DLLEXPORT   swmm_close(void);
 int  DLLEXPORT   swmm_getVersion(void);
 
 // Cosimulation getters
-double DLLEXPORT swmm_get( char* id, int attribute, int units );
-double DLLEXPORT swmm_get_from_input(char* filename, char *id, int attribute);
-int DLLEXPORT swmm_save_all(char* input_file, int object_type, int attribute);
+void DLLEXPORT swmm_store_ids();
+int DLLEXPORT swmm_get(char **, int, double *, int, int, int, int, int);
+void DLLEXPORT swmm_get_all(char **, int, int);
+int DLLEXPORT swmm_get_nobjects(int, int);
 // Cosimulation setters
-int DLLEXPORT swmm_modify_setting(char* id, double new_setting, double tstep);
-int DLLEXPORT swmm_modify_input(char* input_file, char *id, int attribute, double value);
-int DLLEXPORT swmm_save_results();
+int DLLEXPORT swmm_modify_setting(char*, double, double);
 
-#ifdef __cplusplus 
-}   // matches the linkage specification from above */ 
+#ifdef __cplusplus
+}   // matches the linkage specification from above */
 #endif
 
 #endif

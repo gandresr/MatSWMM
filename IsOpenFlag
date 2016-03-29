@@ -1,0 +1,32 @@
+IsOpenFlag
+IsStartedFlag
+
+Mutex1: 1 signal, 0 wait -> for the reader thread
+Mutex2: 1 signal, 0 wait -> for the writer thread
+Mutex3: 1 signal, 0 wait -> for the control thread
+
+THE FUNCTION MUST SWITCH BETWEEN FUNCTIONS
+
+Code	:	  A                     B                C             D
+Process : Initialize -> Running steps until end -> finish -> wait for new sim
+Mutex1		  0
+Mutex2		  0
+Mutex3		  0
+
+Code    | Flag
+------- + -------------------------------------------
+A,B,C   | IsInitializedFlag (TOOL)
+
+Every moment when the IsInitializedFlag is equal to zero (== 0) the reader thread must be running. The reader thread must initialize a fake SWMM simulation, update the modifications that were made by the user in a previous simulation, then wait until the user decides to initialize a real SWMM simulation.
+
+Hundreds of scenarios and then set an envolvent of design
+You have to demonstrate that designing for a critical rain scenario can lead to the malfunction of the system even when a no-critical rain hits a vulnerable part of the system. Then an envolvent an several rain scenarios are required for an optimal design.
+
+Several simulation results are created
+
+Every Try catch must be followed by a swmm.end()
+swmm.modify must work every time if IsInitializedFlag == 0, then it must save the modifications in an old modi_file or a new one.
+
+IT IS NECESSARY TO VERIFY WICH UNITS THE SYSTEM IS USING
+
+DONT FORGET THE PATH TO THE TIME SERIES FOR VARIABLE INPUT IN NODES!!!!
