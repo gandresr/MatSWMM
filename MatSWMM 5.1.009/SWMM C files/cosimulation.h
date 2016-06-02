@@ -29,7 +29,7 @@ enum ErrorConstants {
 };
 
 enum SubcatchProperties {
-	C_GAGE,
+	C_GAGE = 100,
 	C_OUTNODE,
 	C_OUTSUBCATCH,
 	C_INFIL,
@@ -43,7 +43,7 @@ enum SubcatchProperties {
 };
 
 enum NodeProperties {
-	C_INVERTELEV,
+	C_INVERTELEV = 200,
 	C_INITDEPTH,
 	C_FULLDEPTH,
 	C_SURDEPTH,
@@ -55,7 +55,7 @@ enum NodeProperties {
 };
 
 enum LinkProperties {
-	C_NODE1,
+	C_NODE1 = 300,
 	C_NODE2,
 	C_OFFSET1,
 	C_OFFSET2,
@@ -78,7 +78,7 @@ enum LinkProperties {
 };
 
 enum PumpSubProperties {
-	C_INITSETTING,
+	C_INITSETTING = 400,
 	C_YON,
 	C_YOFF,
 	C_XMIN,
@@ -86,7 +86,7 @@ enum PumpSubProperties {
 };
 
 enum OrificeSubProperties {
-	C_SHAPE,
+	C_SHAPE = 500,
 	C_CDISCH,
 	C_ORATE,
 	C_CORIF,
@@ -97,7 +97,7 @@ enum OrificeSubProperties {
 };
 
 enum WeirSubProperties {
-	C_CDISCH1,
+	C_CDISCH1 = 600,
 	C_CDISCH2,
 	C_ENDCON,
 	C_CANSURCHARGE,
@@ -108,7 +108,7 @@ enum WeirSubProperties {
 };
 
 enum OutletSubProperties {
-	C_QCOEFF,
+	C_QCOEFF = 700,
 	C_QEXPON,
 	C_QCURVE,
 	C_CURVETYPE

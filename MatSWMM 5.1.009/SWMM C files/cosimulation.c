@@ -49,12 +49,14 @@ int idxOutlet[Nlinks[OUTLET]];
  ****************************************************************************/
 
 /**
- * Inputs:
- *     swmmType: constant that represents the type of object.
- *     swmmSubType: constant that represents the sub-type of certain type
- *         of objects. It is equal to -1 if no sub-type is requested.
- * Purpose: It returns the number objects of certain type and/or sub-type.
- * Outputs: number of objects, C_ERROR_ATR if there is an error.
+ * + Inputs:
+ *   - swmmType [int] constant that represents the type of object
+ *   - swmmSubType [int] constant that represents the sub-type of certain type
+ *   of objects. It is equal to -1 if no sub-type is requested.
+ * + Purpose:
+ *   It returns the number of objects of certain type and/or sub-type.
+ * + Outputs:
+ *   number of objects [int], C_ERROR_ATR if there is an error.
  */
 int c_get_nobjects(int swmmType, int swmmSubType) {
 	if (swmmType == SUBCATCH) {
@@ -77,10 +79,13 @@ int c_get_nobjects(int swmmType, int swmmSubType) {
 }
 
 /**
- * Inputs: None
- * Purpose: It saves the indexes related to the objects with
- * sub-category in Node[] and Link[].
- * Outputs: None
+ * + Inputs:
+ *   None
+ * + Purpose:
+ *   It saves the indexes related to the objects with
+ *   sub-category in Node[] and Link[].
+ * + Outputs:
+ *   None
  */
 void c_store_ids() {
 	int i, o, s, d, c, p, or, w, ot;
@@ -102,14 +107,16 @@ void c_store_ids() {
 }
 
 /**
- * Inputs:
- *     idsPtr: array of pointers to strings with IDs
- *     swmmType: constant that represents the type of object.
- *     swmmSubType: constant that represents the sub-type of certain type
- *         of objects. It is equal to -1 if no sub-type is requested.
- * Purpose: It fills the array of pointers looking all the objects of
- * an specific type and/or sub-category.
- * Outputs: None
+ * + Inputs:
+ *   - idsPtr: array of pointers to strings with IDs
+ *   - swmmType: constant that represents the type of object.
+ *   - swmmSubType: constant that represents the sub-type of certain type
+ *   of objects. It is equal to -1 if no sub-type is requested.
+ * + Purpose:
+ *   - It fills the array of pointers looking all the objects of
+ *   an specific type and/or sub-category.
+ * + Outputs:
+ *   None
  */
 void c_get_all(char **idsPtr, int swmmType, int swmmSubType) {
 	int i, lenIdsPtr;

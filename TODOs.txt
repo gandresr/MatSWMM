@@ -1,0 +1,18 @@
+- Corregir función modify_input
+
+- Traducir Delphi a C, o compilar Delphi como DLL (?)
+
+- Actualizar manual de usuario de MatSWMM
+
+-  External data file as input
+
+- Easy install MatSWMM from python, and Matlab
+
+- Error input curve file not found
+
+- Corregir lo de la ruta global para entradas variables
+
+- State Estimator
+Kalman Filter
+
+- Verificar cuándo el sistema pasa a ser supercrítico

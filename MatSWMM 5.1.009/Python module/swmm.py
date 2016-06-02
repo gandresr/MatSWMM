@@ -392,6 +392,7 @@ def close(msg=False):
 		raise SystemError ("Error %d: The file can not be closed correctly" % error)
 	if msg:
 		print ("Correctly Closed!")
+	_elapsedTime = c_double(0.000001) # Elapsed time in decimal days
 
 
 def get_mass_bal_error():
