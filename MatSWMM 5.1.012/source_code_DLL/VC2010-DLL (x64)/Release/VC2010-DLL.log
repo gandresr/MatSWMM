@@ -1,0 +1,227 @@
+﻿Build started 10/07/2017 11:37:03.
+     1>Project "C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\VC2010-DLL.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Release\VC2010-DLL.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "Release\VC2010-DLL.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W4 /WX- /O2 /Ot /GL /D _WINDLL /Gm- /MT /GS /fp:fast /fp:except- /Zc:wchar_t /Zc:forScope /openmp /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TC /errorReport:prompt ..\climate.c ..\controls.c ..\cosimulation.c ..\culvert.c ..\datetime.c ..\dwflow.c ..\dynwave.c ..\error.c ..\exfil.c ..\findroot.c ..\flowrout.c ..\forcmain.c ..\gage.c ..\gwater.c ..\hash.c ..\hotstart.c ..\iface.c ..\infil.c ..\inflow.c ..\input.c ..\inputrpt.c ..\keywords.c ..\kinwave.c ..\landuse.c ..\lid.c ..\lidproc.c ..\link.c ..\massbal.c ..\mathexpr.c ..\mempool.c ..\node.c ..\odesolve.c ..\output.c ..\project.c ..\qualrout.c ..\rain.c ..\rdii.c ..\report.c ..\roadway.c ..\routing.c ..\runoff.c ..\shape.c ..\snow.c ..\stats.c ..\statsrpt.c ..\subcatch.c ..\surfqual.c ..\swmm5.c ..\table.c ..\toposort.c ..\transect.c ..\treatmnt.c ..\xsect.c
+         climate.c
+     1>..\climate.c(1075): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\climate.c(1112): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\climate.c(1255): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\climate.c(1383): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\climate.c(1390): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\climate.c(1392): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\climate.c(1394): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\climate.c(1404): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+         controls.c
+         cosimulation.c
+     1>..\cosimulation.c(59): warning C4013: 'mkdir' undefined; assuming extern returning int
+     1>..\cosimulation.c(64): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(70): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(71): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(72): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(74): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(88): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(89): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(90): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(92): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(107): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(108): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(109): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\cosimulation.c(111): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(58): warning C4189: 'time_val' : local variable is initialized but not referenced
+     1>..\cosimulation.c(57): warning C4101: 's' : unreferenced local variable
+     1>..\cosimulation.c(222): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(248): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(253) : see declaration of 'fscanf'
+     1>..\cosimulation.c(251): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(253) : see declaration of 'fscanf'
+     1>..\cosimulation.c(300): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(330): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(253) : see declaration of 'fscanf'
+     1>..\cosimulation.c(375): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(376): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\cosimulation.c(398): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(253) : see declaration of 'fscanf'
+     1>..\cosimulation.c(412): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>..\cosimulation.c(421): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\string.h(197) : see declaration of 'strtok'
+     1>..\cosimulation.c(377): warning C4101: 'i' : unreferenced local variable
+     1>..\cosimulation.c(380): warning C4101: 'variable_name' : unreferenced local variable
+     1>..\cosimulation.c(381): warning C4101: 'variable_value' : unreferenced local variable
+     1>..\cosimulation.c(462): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(325) : see declaration of 'sscanf'
+     1>..\cosimulation.c(464): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\cosimulation.c(465): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\cosimulation.c(468): warning C4267: 'initializing' : conversion from 'size_t' to 'int', possible loss of data
+         culvert.c
+         datetime.c
+         dwflow.c
+         dynwave.c
+         error.c
+         exfil.c
+         findroot.c
+         flowrout.c
+         forcmain.c
+         gage.c
+         gwater.c
+     1>..\gwater.c(688): warning C4100: 't' : unreferenced formal parameter
+         hash.c
+         hotstart.c
+         iface.c
+         infil.c
+         inflow.c
+         input.c
+     1>..\input.c(185): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\input.c(190): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\input.c(673): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\input.c(871): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\input.c(876): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\input.c(884): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+         Compiling...
+         inputrpt.c
+         keywords.c
+         kinwave.c
+     1>..\kinwave.c(257): warning C4100: 'p' : unreferenced formal parameter
+         landuse.c
+         lid.c
+         lidproc.c
+         link.c
+         massbal.c
+         mathexpr.c
+     1>..\mathexpr.c(762): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+         mempool.c
+         node.c
+         odesolve.c
+         output.c
+     1>..\output.c(487): warning C4267: 'initializing' : conversion from 'size_t' to 'int', possible loss of data
+         project.c
+     1>..\project.c(318): warning C4267: '=' : conversion from 'size_t' to 'int', possible loss of data
+         qualrout.c
+         rain.c
+     1>..\rain.c(601): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\rain.c(610): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\rain.c(628): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>..\rain.c(732): warning C4267: 'initializing' : conversion from 'size_t' to 'int', possible loss of data
+         rdii.c
+         report.c
+         roadway.c
+         routing.c
+         Compiling...
+         runoff.c
+     1>..\runoff.c(435): warning C4267: '+=' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\runoff.c(444): warning C4267: '+=' : conversion from 'size_t' to 'int', possible loss of data
+         shape.c
+         snow.c
+         stats.c
+         statsrpt.c
+         subcatch.c
+     1>..\subcatch.c(1101): warning C4100: 't' : unreferenced formal parameter
+         surfqual.c
+         swmm5.c
+     1>..\swmm5.c(888): warning C4100: 's' : unreferenced formal parameter
+         table.c
+         toposort.c
+         transect.c
+         treatmnt.c
+         xsect.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.dll" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /DEF:"swmm5.def" /MANIFEST /ManifestFile:"Release\swmm5.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.pdb" /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.lib" /MACHINE:X64 /DLL Release\climate.obj
+         Release\controls.obj
+         Release\cosimulation.obj
+         Release\culvert.obj
+         Release\datetime.obj
+         Release\dwflow.obj
+         Release\dynwave.obj
+         Release\error.obj
+         Release\exfil.obj
+         Release\findroot.obj
+         Release\flowrout.obj
+         Release\forcmain.obj
+         Release\gage.obj
+         Release\gwater.obj
+         Release\hash.obj
+         Release\hotstart.obj
+         Release\iface.obj
+         Release\infil.obj
+         Release\inflow.obj
+         Release\input.obj
+         Release\inputrpt.obj
+         Release\keywords.obj
+         Release\kinwave.obj
+         Release\landuse.obj
+         Release\lid.obj
+         Release\lidproc.obj
+         Release\link.obj
+         Release\massbal.obj
+         Release\mathexpr.obj
+         Release\mempool.obj
+         Release\node.obj
+         Release\odesolve.obj
+         Release\output.obj
+         Release\project.obj
+         Release\qualrout.obj
+         Release\rain.obj
+         Release\rdii.obj
+         Release\report.obj
+         Release\roadway.obj
+         Release\routing.obj
+         Release\runoff.obj
+         Release\shape.obj
+         Release\snow.obj
+         Release\stats.obj
+         Release\statsrpt.obj
+         Release\subcatch.obj
+         Release\surfqual.obj
+         Release\swmm5.obj
+         Release\table.obj
+         Release\toposort.obj
+         Release\transect.obj
+         Release\treatmnt.obj
+         Release\xsect.obj
+     1>swmm5.obj : warning LNK4197: export 'swmm_save_results' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_modify_input' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_modify_setting' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_save_all' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_get_from_input' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_get' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_getError' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_getWarnings' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_getVersion' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_getMassBalErr' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_close' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_report' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_end' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_step' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_start' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_open' specified multiple times; using first specification
+     1>swmm5.obj : warning LNK4197: export 'swmm_run' specified multiple times; using first specification
+            Creating library C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.lib and object C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.exp
+         Generating code
+     1>c:\users\1\downloads\swmm51012_engine_2\cosimulation.c(473): warning C4701: potentially uninitialized local variable 'attribute_key' used
+     1>c:\users\1\downloads\swmm51012_engine_2\cosimulation.c(153): warning C4701: potentially uninitialized local variable 'j' used
+     1>c:\users\1\downloads\swmm51012_engine_2\cosimulation.c(155): warning C4701: potentially uninitialized local variable 'type' used
+     1>c:\users\1\downloads\swmm51012_engine_2\rain.c(835): warning C4701: potentially uninitialized local variable 'second' used
+         Finished generating code
+         VC2010-DLL.vcxproj -> C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.dll
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\Release\swmm5.dll;#2" /manifest Release\swmm5.dll.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Release\VC2010-DLL.unsuccessfulbuild".
+         Touching "Release\VC2010-DLL.lastbuildstate".
+     1>Done Building Project "C:\Users\1\Downloads\swmm51012_engine_2\VC2010-DLL\VC2010-DLL.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:18.34
